@@ -29,9 +29,9 @@ public class HelloApplication extends Application {
 
                     // Example: Turn off lamp 2
                     controller.setLampState(2, false);
+
                     // Example: Turn off lamp 3
                     controller.setLampState(3, false);
-
 
                 } catch (IOException e) {
                     e.printStackTrace();
