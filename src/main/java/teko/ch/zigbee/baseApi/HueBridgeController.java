@@ -18,9 +18,10 @@ public class HueBridgeController {
         this.apiKey = apiKey;
     }
 
-    public void setLampState(int lampNumber, boolean on) throws IOException {
+    public void setLampState(int lampNumber, String on, String color) throws IOException {
         String apiUrl = bridgeBaseUrl + apiKey + "/lights/" + lampNumber + "/state";
-        String json = "{\"on\":" + on + "}";
+        String json = "{\"" + on + "\":" + color + "}";
+
 
         HttpURLConnection connection = null;
         try {
@@ -31,6 +32,7 @@ public class HueBridgeController {
             connection.setDoOutput(true);
 
             OutputStreamWriter os = new OutputStreamWriter(connection.getOutputStream());
+            System.out.println(json);
             os.write(json);
             os.close();
 

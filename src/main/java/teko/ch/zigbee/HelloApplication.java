@@ -24,14 +24,14 @@ public class HelloApplication extends Application {
         HueBridgeController controller = new HueBridgeController(bridgeBaseUrl, apiKey);
 
                 try {
-                    // Example: Turn on lamp 1
-                    controller.setLampState(1, true);
+                    controller.setLampState(3, "on", "false");
+                    controller.setLampState(1, "xy", "[0.20,0.55]");
 
                     // Example: Turn off lamp 2
-                    controller.setLampState(2, false);
+                    //controller.setLampState(2, "true");
 
                     // Example: Turn off lamp 3
-                    controller.setLampState(3, false);
+                    //controller.setLampState(3, "true");
 
                 } catch (IOException e) {
                     e.printStackTrace();
