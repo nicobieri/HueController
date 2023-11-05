@@ -8,6 +8,11 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 public class HueBridgeController {
     private String bridgeBaseUrl;
@@ -40,6 +45,45 @@ public class HueBridgeController {
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 throw new IOException("HTTP error code: " + responseCode);
             }
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
+    public void getLampState(int lampNumber) throws IOException {
+        String apiUrl = bridgeBaseUrl + apiKey + "/lights/" + lampNumber;
+
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL(apiUrl);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Accept", "application/json");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                throw new IOException("HTTP error code: " + responseCode);
+            }
+
+            // Read the response
+            InputStreamReader isr = new InputStreamReader(connection.getInputStream());
+            BufferedReader br = new BufferedReader(isr);
+            String line;
+            StringBuilder response = new StringBuilder();
+            while ((line = br.readLine()) != null) {
+                response.append(line);
+            }
+            br.close();
+
+            // Print the response
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode rootNode = mapper.readTree(response.toString());
+
+// To access a specific field, e.g., "name"
+            JsonNode nameNode = rootNode.get("name");
+            System.out.println("Lamp Name: " + nameNode.asText());
+
         } finally {
             if (connection != null) {
                 connection.disconnect();

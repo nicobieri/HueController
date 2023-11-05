@@ -24,8 +24,10 @@ public class HelloApplication extends Application {
         HueBridgeController controller = new HueBridgeController(bridgeBaseUrl, apiKey);
 
                 try {
-                    controller.setLampState(3, "on", "false");
+                    controller.setLampState(1, "on", "false");
                     controller.setLampState(1, "xy", "[0.20,0.55]");
+
+                    controller.getLampState(1);
 
                     // Example: Turn off lamp 2
                     //controller.setLampState(2, "true");
