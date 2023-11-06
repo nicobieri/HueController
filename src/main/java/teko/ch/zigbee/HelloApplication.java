@@ -17,9 +17,15 @@ public class HelloApplication extends Application {
        // stage.setTitle("Hello!");
        // stage.setScene(scene);
        // stage.show();
+        ///todo Nico
+        //String bridgeBaseUrl = "http://192.168.1.103/api/"; // Replace with your Hue Bridge base URL
+        //String apiKey = "5kAfpCWnRQeUphawHE7yN2Fon4l4ZJjzqvVo788T"; // Replace with your API key
 
-         String bridgeBaseUrl = "http://192.168.1.103/api/"; // Replace with your Hue Bridge base URL
-        String apiKey = "5kAfpCWnRQeUphawHE7yN2Fon4l4ZJjzqvVo788T"; // Replace with your API key
+        ///todo Steve
+        String bridgeBaseUrl = "http://192.168.1.114/api/"; // Replace with your Hue Bridge base URL
+        String apiKey = "4PCT1TYO3UrSjf7lLsQODWsrjfS-C7m47l0FOCFc"; // Replace with your API key
+
+
 
         HueBridgeController controller = new HueBridgeController(bridgeBaseUrl, apiKey);
 
