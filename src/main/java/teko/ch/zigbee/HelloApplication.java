@@ -21,12 +21,13 @@ public class HelloApplication extends Application {
         // Assuming you want to use the first Bridge IP found
         String bridgeIP = ipAddresses.get(0);
         System.out.println("Hue Bridge IP: " + bridgeIP);
-        ///todo Nico
+        
         String bridgeBaseUrl = "http://" + bridgeIP + "/api/"; // Replace with your Hue Bridge base URL
+        ///todo Nico
+
         String apiKey = "5kAfpCWnRQeUphawHE7yN2Fon4l4ZJjzqvVo788T"; // Replace with your API key
 
         ///todo Steve
-        //String bridgeBaseUrl = "http://192.168.1.114/api/"; // Replace with your Hue Bridge base URL
         //String apiKey = "4PCT1TYO3UrSjf7lLsQODWsrjfS-C7m47l0FOCFc"; // Replace with your API key
 
 
