@@ -3,7 +3,7 @@ package teko.ch.zigbee;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import teko.ch.zigbee.baseApi.HueBridgeController;
-import teko.ch.zigbee.baseApi.HueBridgeIPFinder;
+import teko.ch.zigbee.baseApi.hueBridgeConnector;
 import java.io.IOException;
 import java.util.List;
 
@@ -17,26 +17,30 @@ public class HelloApplication extends Application {
        // stage.show();
 
 
-        List<String> ipAddresses = HueBridgeIPFinder.getMyIP();
-        // Assuming you want to use the first Bridge IP found
-        String bridgeIP = ipAddresses.get(0);
-        System.out.println("Hue Bridge IP: " + bridgeIP);
-        
-        String bridgeBaseUrl = "http://" + bridgeIP + "/api/"; // Replace with your Hue Bridge base URL
+        String ipAddress = hueBridgeConnector.getMyIP();
+        System.out.println("Hue Bridge IP: " + ipAddress);
+
+        hueBridgeConnector connector = new hueBridgeConnector();
+        //Assuming you want to use the first Bridge IP found
+        String bridgeKey = connector.getKey();
+        System.out.println(bridgeKey);
+
+
+        String bridgeBaseUrl = "http://" + ipAddress + "/api/"; // Replace with your Hue Bridge base URL
         ///todo Nico
 
-        String apiKey = "5kAfpCWnRQeUphawHE7yN2Fon4l4ZJjzqvVo788T"; // Replace with your API key
+        //String apiKey = "5kAfpCWnRQeUphawHE7yN2Fon4l4ZJjzqvVo788T"; // Replace with your API key
 
         ///todo Steve
         //String apiKey = "4PCT1TYO3UrSjf7lLsQODWsrjfS-C7m47l0FOCFc"; // Replace with your API key
 
 
 
-        HueBridgeController controller = new HueBridgeController(bridgeBaseUrl, apiKey);
+        HueBridgeController controller = new HueBridgeController(bridgeBaseUrl, bridgeKey);
 
                 try {
                     controller.setLampState(1, "on", "true");
-                    controller.setLampState(1, "xy", "[0.20,0.15]");
+                    controller.setLampState(1, "xy", "[0.20,0.45]");
 
                     controller.getLampState(1);
 
