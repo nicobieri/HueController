@@ -90,4 +90,39 @@ public class HueBridgeController {
             }
         }
     }
+
+    public JsonNode getAllLamps() throws IOException {
+        String apiUrl = bridgeBaseUrl + apiKey + "/lights/";
+
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL(apiUrl);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Accept", "application/json");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                throw new IOException("HTTP error code: " + responseCode);
+            }
+
+            // Read the response
+            InputStreamReader isr = new InputStreamReader(connection.getInputStream());
+            BufferedReader br = new BufferedReader(isr);
+            String line;
+            StringBuilder response = new StringBuilder();
+            while ((line = br.readLine()) != null) {
+                response.append(line);
+            }
+            br.close();
+
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readTree(response.toString());
+
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
 }
