@@ -1,5 +1,6 @@
 package teko.ch.zigbee;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import teko.ch.zigbee.baseApi.ConfigManager;
@@ -8,6 +9,7 @@ import teko.ch.zigbee.baseApi.hueBridgeConnector;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -56,9 +58,11 @@ public class HelloApplication extends Application {
         System.out.println("finish");
         try {
             controller.setLampState(1, "on", "true");
-            controller.setLampState(1, "xy", "[0.20,0.45]");
+            controller.setLampState(1, "xyz", "[0.00,0.00,0.00]");
 
             controller.getLampState(1);
+            JsonNode jsonResponse = controller.getAllLamps();
+            System.out.println(jsonResponse);
 
 
 
