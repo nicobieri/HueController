@@ -28,31 +28,12 @@ public class HelloApplication extends Application {
         Map<String, String> configData = new HashMap<>();
         Map<String, String> readData = ConfigManager.readConfig(configFilePath);
 
+
         String ipAddress = readData.get("IP");
         String bridgeKey = readData.get("Key");
         hueBridgeConnector connector = new hueBridgeConnector();
 
-        if (ipAddress != null && bridgeKey != null) {
-            String bridgeBaseUrl = "http://" + ipAddress + "/api/"; // Replace with your Hue Bridge base URL
-
-
-            HueBridgeController controller = new HueBridgeController(bridgeBaseUrl, bridgeKey);
-
-            try {
-                controller.setLampState(1, "on", "true");
-                controller.setLampState(1, "xy", "[0.20,0.45]");
-
-                controller.getLampState(1);
-
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            System.out.println("finish");
-
-        } else {
+        if (ipAddress == null && bridgeKey == null) {
             ipAddress = hueBridgeConnector.getMyIP();
             bridgeKey = connector.getKey();
 
@@ -63,6 +44,26 @@ public class HelloApplication extends Application {
 
             executorService.schedule(task, 2, TimeUnit.SECONDS);
 
+
+        }
+        String bridgeBaseUrl = "http://" + ipAddress + "/api/"; // Replace with your Hue Bridge base URL
+
+        HueBridgeController controller = new HueBridgeController(bridgeBaseUrl, bridgeKey);
+
+
+
+
+        System.out.println("finish");
+        try {
+            controller.setLampState(1, "on", "true");
+            controller.setLampState(1, "xy", "[0.20,0.45]");
+
+            controller.getLampState(1);
+
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }
