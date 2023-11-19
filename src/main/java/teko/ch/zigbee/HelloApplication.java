@@ -62,7 +62,7 @@ public class HelloApplication extends Application {
 
             controller.getLampState(1);
             JsonNode jsonResponse = controller.getAllLamps();
-            System.out.println(jsonResponse);
+            System.out.println(jsonResponse.toString());
 
 
 
