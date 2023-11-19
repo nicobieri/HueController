@@ -9,7 +9,9 @@ import teko.ch.zigbee.baseApi.hueBridgeConnector;
 import javax.swing.*;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.Map;
 
 public class HelloApplication extends Application {
@@ -21,6 +23,7 @@ public class HelloApplication extends Application {
         // stage.setScene(scene);
         // stage.show();
 
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         String configFilePath = "config.txt";
         Map<String, String> configData = new HashMap<>();
         Map<String, String> readData = ConfigManager.readConfig(configFilePath);
@@ -37,7 +40,7 @@ public class HelloApplication extends Application {
 
             try {
                 controller.setLampState(1, "on", "true");
-                controller.setLampState(1, "xy", "[0.20,0.15]");
+                controller.setLampState(1, "xy", "[0.20,0.45]");
 
                 controller.getLampState(1);
 
@@ -54,12 +57,12 @@ public class HelloApplication extends Application {
             bridgeKey = connector.getKey();
 
             configData.put("IP", ipAddress);
-            ConfigManager.writeConfig(configFilePath, configData);
-            System.out.println();
-
-
             configData.put("Key", bridgeKey);
-            ConfigManager.writeConfig(configFilePath, configData);
+
+            Runnable task = () -> ConfigManager.writeConfig(configFilePath, configData);
+
+            executorService.schedule(task, 2, TimeUnit.SECONDS);
+
         }
 
     }
