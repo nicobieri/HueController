@@ -2,62 +2,78 @@ package teko.ch.zigbee;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import teko.ch.zigbee.baseApi.ConfigManager;
 import teko.ch.zigbee.baseApi.HueBridgeController;
 import teko.ch.zigbee.baseApi.hueBridgeConnector;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HelloApplication extends Application {
   //  @Override
     public void start(Stage stage) throws IOException {
-       // FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
-       // Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-       // stage.setTitle("Hello!");
-       // stage.setScene(scene);
-       // stage.show();
+        // FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
+        // Scene scene = new Scene(fxmlLoader.load(), 320, 240);
+        // stage.setTitle("Hello!");
+        // stage.setScene(scene);
+        // stage.show();
+
+        String configFilePath = "config.txt";
+        Map<String, String> configData = new HashMap<>();
+        Map<String, String> readData = ConfigManager.readConfig(configFilePath);
+
+        String ipAddress = readData.get("IP");
+        String bridgeKey = readData.get("Key");
 
 
-        String ipAddress = hueBridgeConnector.getMyIP();
+        if (ipAddress != null && bridgeKey != null) {
+            String bridgeBaseUrl = "http://" + ipAddress + "/api/"; // Replace with your Hue Bridge base URL
+
+
+            HueBridgeController controller = new HueBridgeController(bridgeBaseUrl, bridgeKey);
+
+            try {
+                controller.setLampState(1, "on", "true");
+                controller.setLampState(1, "xy", "[0.20,0.15]");
+
+                controller.getLampState(1);
+
+
+                // Example: Turn off lamp 2
+                //controller.setLampState(2, "true");
+
+                // Example: Turn off lamp 3
+                //controller.setLampState(3, "true");
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("finish");
+
+        }
+
+
+        ipAddress = hueBridgeConnector.getMyIP();
         System.out.println("Hue Bridge IP: " + ipAddress);
+
+        configData.put("IP", ipAddress);
+        ConfigManager.writeConfig(configFilePath, configData);
+        System.out.println();
+
 
         hueBridgeConnector connector = new hueBridgeConnector();
         //Assuming you want to use the first Bridge IP found
-        String bridgeKey = connector.getKey();
-        System.out.println(bridgeKey);
+        bridgeKey = connector.getKey();
+        configData.put("Key", bridgeKey);
+        ConfigManager.writeConfig(configFilePath, configData);
 
+        String ipAddressFromConfig = readData.get("IP");
+        String bridgeKeyFromConfig = readData.get("Key");
 
-        String bridgeBaseUrl = "http://" + ipAddress + "/api/"; // Replace with your Hue Bridge base URL
-        ///todo Nico
-
-        //String apiKey = "5kAfpCWnRQeUphawHE7yN2Fon4l4ZJjzqvVo788T"; // Replace with your API key
-
-        ///todo Steve
-        //String apiKey = "4PCT1TYO3UrSjf7lLsQODWsrjfS-C7m47l0FOCFc"; // Replace with your API key
-
-
-
-        HueBridgeController controller = new HueBridgeController(bridgeBaseUrl, bridgeKey);
-
-                try {
-                    controller.setLampState(1, "on", "true");
-                    controller.setLampState(1, "xy", "[0.20,0.45]");
-
-                    controller.getLampState(1);
-
-
-
-                    // Example: Turn off lamp 2
-                    //controller.setLampState(2, "true");
-
-                    // Example: Turn off lamp 3
-                    //controller.setLampState(3, "true");
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-        System.out.println("finish");
-
+        System.out.println("config " + ipAddressFromConfig);
+        System.out.println("config " + bridgeKeyFromConfig);
     }
 
     public static void main(String[] args) {
