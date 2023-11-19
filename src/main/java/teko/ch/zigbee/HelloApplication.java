@@ -25,7 +25,7 @@ public class HelloApplication extends Application {
 
         String ipAddress = readData.get("IP");
         String bridgeKey = readData.get("Key");
-
+        hueBridgeConnector connector = new hueBridgeConnector();
 
         if (ipAddress != null && bridgeKey != null) {
             String bridgeBaseUrl = "http://" + ipAddress + "/api/"; // Replace with your Hue Bridge base URL
@@ -40,11 +40,6 @@ public class HelloApplication extends Application {
                 controller.getLampState(1);
 
 
-                // Example: Turn off lamp 2
-                //controller.setLampState(2, "true");
-
-                // Example: Turn off lamp 3
-                //controller.setLampState(3, "true");
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -52,28 +47,19 @@ public class HelloApplication extends Application {
 
             System.out.println("finish");
 
+        } else {
+            ipAddress = hueBridgeConnector.getMyIP();
+            bridgeKey = connector.getKey();
+
+            configData.put("IP", ipAddress);
+            ConfigManager.writeConfig(configFilePath, configData);
+            System.out.println();
+
+
+            configData.put("Key", bridgeKey);
+            ConfigManager.writeConfig(configFilePath, configData);
         }
 
-
-        ipAddress = hueBridgeConnector.getMyIP();
-        System.out.println("Hue Bridge IP: " + ipAddress);
-
-        configData.put("IP", ipAddress);
-        ConfigManager.writeConfig(configFilePath, configData);
-        System.out.println();
-
-
-        hueBridgeConnector connector = new hueBridgeConnector();
-        //Assuming you want to use the first Bridge IP found
-        bridgeKey = connector.getKey();
-        configData.put("Key", bridgeKey);
-        ConfigManager.writeConfig(configFilePath, configData);
-
-        String ipAddressFromConfig = readData.get("IP");
-        String bridgeKeyFromConfig = readData.get("Key");
-
-        System.out.println("config " + ipAddressFromConfig);
-        System.out.println("config " + bridgeKeyFromConfig);
     }
 
     public static void main(String[] args) {
