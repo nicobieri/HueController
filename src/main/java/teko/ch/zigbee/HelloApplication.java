@@ -9,7 +9,6 @@ import teko.ch.zigbee.baseApi.hueBridgeConnector;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.sql.SQLOutput;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
