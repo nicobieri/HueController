@@ -40,14 +40,15 @@ public class hueBridgeConnector {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-
+           // e.printStackTrace();
+            System.out.println("this");
         }
         String ipAddress = ipAddresses.toString();
         if (ipAddress.startsWith("[") && ipAddress.endsWith("]")) {
             ipAddress = ipAddress.substring(1, ipAddress.length() - 1);
         }
         return ipAddress;
+
     }
 
     public String getKey() throws IOException {
@@ -70,8 +71,10 @@ public class hueBridgeConnector {
                 try (OutputStream os = connection.getOutputStream()) {
                     byte[] input = jsonInputString.getBytes("utf-8");
                     os.write(input, 0, input.length);
+                } catch (ArithmeticException e) {
+                   System.out.println("connetion nicht gefunden");
                 }
-
+                System.out.println("hello");
                 int responseCode = connection.getResponseCode();
                 if (responseCode != HttpURLConnection.HTTP_OK) {
                     throw new IOException("HTTP error code: " + responseCode);

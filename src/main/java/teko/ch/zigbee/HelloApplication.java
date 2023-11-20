@@ -4,6 +4,8 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import teko.ch.zigbee.baseApi.HueBridgeController;
 import teko.ch.zigbee.baseApi.hueBridgeConnector;
+
+import javax.swing.*;
 import java.io.IOException;
 import java.util.List;
 
@@ -61,6 +63,12 @@ public class HelloApplication extends Application {
     }
 
     public static void main(String[] args) {
+        JFrame frame = new JFrame("Hue Controller");
+        HueContollerOverlay panel = new HueContollerOverlay();
+        frame.add(panel);
+        frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
 
         launch();
 
