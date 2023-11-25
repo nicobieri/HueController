@@ -24,52 +24,6 @@ public class HelloApplication extends Application {
         // stage.setScene(scene);
         // stage.show();
 
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        String configFilePath = "config.txt";
-        Map<String, String> configData = new HashMap<>();
-        Map<String, String> readData = ConfigManager.readConfig(configFilePath);
-
-
-        String ipAddress = readData.get("IP");
-        String bridgeKey = readData.get("Key");
-        hueBridgeConnector connector = new hueBridgeConnector();
-
-        if (ipAddress == null && bridgeKey == null) {
-            ipAddress = hueBridgeConnector.getMyIP();
-            bridgeKey = connector.getKey();
-
-            configData.put("IP", ipAddress);
-            configData.put("Key", bridgeKey);
-
-            Runnable task = () -> ConfigManager.writeConfig(configFilePath, configData);
-
-            executorService.schedule(task, 2, TimeUnit.SECONDS);
-
-
-        }
-        String bridgeBaseUrl = "http://" + ipAddress + "/api/"; // Replace with your Hue Bridge base URL
-
-        HueBridgeController controller = new HueBridgeController(bridgeBaseUrl, bridgeKey);
-
-
-
-        System.out.println("finish");
-        try {
-            controller.setLampState(1, "on", "true");
-            controller.setLampState(1, "xyz", "[0.00,0.00,0.00]");
-
-
-                controller.getLampState(1);
-                JsonNode jsonResponse = controller.getAllLamps();
-                System.out.println(jsonResponse.toString());
-
-
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     public static void main(String[] args) {

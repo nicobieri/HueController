@@ -3,55 +3,26 @@
   <grid id="27dc6" binding="HueGui" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="100" left="0" bottom="100" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="725" height="807"/>
+      <xy x="20" y="20" width="725" height="623"/>
     </constraints>
     <properties>
-      <background color="-13881336"/>
+      <background color="-14604752"/>
       <enabled value="false"/>
       <foreground color="-5224987"/>
     </properties>
     <border type="none"/>
     <children>
-      <grid id="fb098" binding="Panel" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-        <margin top="0" left="0" bottom="0" right="0"/>
+      <component id="eb727" class="javax.swing.JButton" binding="ButtonToConnect">
         <constraints>
-          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false">
+            <minimum-size width="100" height="100"/>
+          </grid>
         </constraints>
         <properties>
-          <background color="-13624559"/>
+          <background color="-8224636"/>
+          <text value="Connect to your Hue Bridge"/>
         </properties>
-        <border type="none"/>
-        <children>
-          <component id="eb727" class="javax.swing.JButton" binding="connectToYourHueButton" default-binding="true">
-            <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Connect to your Hue Bridge"/>
-            </properties>
-          </component>
-          <component id="bab4f" class="javax.swing.JFormattedTextField" binding="welcomeToOurPhilipsFormattedTextField" default-binding="true">
-            <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="0" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="-1"/>
-              </grid>
-            </constraints>
-            <properties>
-              <text value="Welcome to our Philips Hue Applicaton"/>
-            </properties>
-          </component>
-          <component id="740e8" class="javax.swing.JFormattedTextField" binding="connectHereToYourFormattedTextField" default-binding="true">
-            <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="0" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="-1"/>
-              </grid>
-            </constraints>
-            <properties>
-              <text value="Connect here to your Hue Bridge"/>
-            </properties>
-          </component>
-        </children>
-      </grid>
+      </component>
     </children>
   </grid>
 </form>
