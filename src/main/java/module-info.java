@@ -3,7 +3,7 @@ module teko.ch.zigbee {
     requires javafx.fxml;
     requires com.fasterxml.jackson.databind;
     requires org.json;
-    requires java.desktop;
+    requires java.sql;
 
 
     opens teko.ch.zigbee to javafx.fxml;
