@@ -25,8 +25,15 @@
         <properties>
           <actionCommand value="Connect"/>
           <background color="-8224636"/>
+          <borderPainted value="false"/>
+          <contentAreaFilled value="true"/>
           <label value="Connect"/>
+          <opaque value="true"/>
+          <requestFocusEnabled value="false"/>
+          <rolloverEnabled value="true"/>
+          <selected value="false"/>
           <text value="Connect"/>
+          <verifyInputWhenFocusTarget value="false"/>
         </properties>
       </component>
       <component id="4fe04" class="javax.swing.JLabel">
