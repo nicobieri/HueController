@@ -24,6 +24,7 @@ public class HueGui extends JPanel {
         this.setLayout(new BorderLayout()); // Set the layout manager to BorderLayout
         // ... (Initialize your components)
         this.add(HueGui, BorderLayout.CENTER);
+
         initComponents();
         ButtonToConnect.addActionListener(new ActionListener() {
             @Override
