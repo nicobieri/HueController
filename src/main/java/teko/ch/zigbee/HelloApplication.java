@@ -6,8 +6,9 @@ import javafx.stage.Stage;
 import teko.ch.zigbee.baseApi.ConfigManager;
 import teko.ch.zigbee.baseApi.HueBridgeController;
 import teko.ch.zigbee.baseApi.hueBridgeConnector;
+
+import javax.swing.*;
 import java.io.IOException;
-import java.sql.SQLOutput;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -52,15 +53,16 @@ public class HelloApplication extends Application {
 
 
 
-
         System.out.println("finish");
         try {
             controller.setLampState(1, "on", "true");
             controller.setLampState(1, "xyz", "[0.00,0.00,0.00]");
 
-            controller.getLampState(1);
-            JsonNode jsonResponse = controller.getAllLamps();
-            System.out.println(jsonResponse.toString());
+
+                controller.getLampState(1);
+                JsonNode jsonResponse = controller.getAllLamps();
+                System.out.println(jsonResponse.toString());
+
 
 
 
@@ -71,6 +73,12 @@ public class HelloApplication extends Application {
     }
 
     public static void main(String[] args) {
+        JFrame frame = new JFrame("Hue Controller");
+        HueContollerOverlay panel = new HueContollerOverlay();
+        frame.add(panel);
+        frame.pack();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
 
         launch();
 

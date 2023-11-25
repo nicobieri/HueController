@@ -51,11 +51,10 @@ public class HueBridgeController {
             }
         }
     }
-    public void getLampState(int lampNumber) throws IOException {
-        String apiUrl = bridgeBaseUrl + apiKey + "/lights/" + lampNumber;
-
+    public void getLampState(int lampNumber) {
         HttpURLConnection connection = null;
         try {
+            String apiUrl = bridgeBaseUrl + apiKey + "/lights/" + lampNumber;
             URL url = new URL(apiUrl);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
@@ -63,7 +62,8 @@ public class HueBridgeController {
 
             int responseCode = connection.getResponseCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
-                throw new IOException("HTTP error code: " + responseCode);
+                System.out.println("Error No Connection to the Hue Bridge!");
+                return;
             }
 
             // Read the response
@@ -76,20 +76,31 @@ public class HueBridgeController {
             }
             br.close();
 
-            // Print the response
+            // Process the response
             ObjectMapper mapper = new ObjectMapper();
             JsonNode rootNode = mapper.readTree(response.toString());
 
-// To access a specific field, e.g., "name"
+            // Check if the response is empty or nameNode is null
+            if (response.length() == 0 || !rootNode.has("name")) {
+                System.out.println("Error No Connection to the Hue Bridge!");
+                return;
+            }
+
+            // Print the lamp name
             JsonNode nameNode = rootNode.get("name");
             System.out.println("Lamp Name: " + nameNode.asText());
 
+        } catch (IOException e) {
+            // Handle IOException by printing an error message
+            System.out.println("Error No Connection to the Hue Bridge!");
         } finally {
             if (connection != null) {
                 connection.disconnect();
             }
         }
     }
+
+
 
     public JsonNode getAllLamps() throws IOException {
         String apiUrl = bridgeBaseUrl + apiKey + "/lights/";
@@ -117,7 +128,13 @@ public class HueBridgeController {
             br.close();
 
             ObjectMapper mapper = new ObjectMapper();
-            return mapper.readTree(response.toString());
+            JsonNode rootNode = mapper.readTree(response.toString());
+
+            if (rootNode != null) {
+                return rootNode;
+            } else {
+                throw new IOException("Error: Response is null or invalid");
+            }
 
         } finally {
             if (connection != null) {
@@ -125,4 +142,5 @@ public class HueBridgeController {
             }
         }
     }
+
 }
