@@ -19,8 +19,9 @@ import java.util.concurrent.TimeUnit;
 public class HueGui extends JPanel {
     private JPanel HueGui;
     private JButton ButtonToConnect;
+    private MainFrame mainFrame;
 
-    public HueGui() {
+    public HueGui(MainFrame mainFrame) {
         this.setLayout(new BorderLayout()); // Set the layout manager to BorderLayout
         // ... (Initialize your components)
         this.add(HueGui, BorderLayout.CENTER);
@@ -72,7 +73,7 @@ public class HueGui extends JPanel {
                     JsonNode jsonResponse = controller.getAllLamps();
                     System.out.println(jsonResponse.toString());
 
-
+                    mainFrame.switchToPanel("HueMenue");
 
 
                 } catch (IOException ex) {
