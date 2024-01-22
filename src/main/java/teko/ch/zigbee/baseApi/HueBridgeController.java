@@ -107,6 +107,7 @@ public class HueBridgeController {
 
         HttpURLConnection connection = null;
         try {
+            System.out.println(apiUrl);
             URL url = new URL(apiUrl);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");

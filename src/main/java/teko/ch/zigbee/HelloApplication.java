@@ -6,9 +6,9 @@ import javafx.stage.Stage;
 import teko.ch.zigbee.HueGUI.HueGui;
 import teko.ch.zigbee.HueGUI.HueMenue;
 import teko.ch.zigbee.HueGUI.MainFrame;
-import teko.ch.zigbee.baseApi.ConfigManager;
+import teko.ch.zigbee.baseApi.*;
 import teko.ch.zigbee.baseApi.HueBridgeController;
-import teko.ch.zigbee.baseApi.hueBridgeConnector;
+
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class HelloApplication extends Application {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // JFrame frame = new JFrame("Hue Controller");
         // HueContollerOverlay panel = new HueContollerOverlay();
        // HueGui panel = new HueGui();
@@ -50,7 +50,16 @@ public class HelloApplication extends Application {
         File configFile = new File("config.txt");
         if (configFile.exists()) {
             System.out.println("Config file exists");
+            readData read = new readData();
+            String Ip = read.getIpAddress();
+            String Key = read.getBridgeKey();
+
+            String bridgeBaseUrl = "http://" + Ip + "/api/";
+            HueBridgeController controller = new HueBridgeController(bridgeBaseUrl, Key);
+            JsonNode jsonResponse = controller.getAllLamps();
+            System.out.println(jsonResponse.toString());
             mainFrame.switchToPanel("HueMenue");
+            mainFrame.updateHueMenuePanel(jsonResponse);
         } else {
             System.out.println("Config file does not exist");
             mainFrame.switchToPanel("HueGui");
