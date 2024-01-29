@@ -42,8 +42,8 @@ public class HelloApplication extends Application {
         // frame.setVisible(true);
 
         MainFrame mainFrame = new MainFrame();
-        HueGui hueGuiPanel = new HueGui(mainFrame); // Assuming HueGui is a JPanel
-        HueMenue hueMenuePanel = new HueMenue(); // Replace with your actual other panel
+        HueGui hueGuiPanel = new HueGui(mainFrame);
+        HueMenue hueMenuePanel = new HueMenue();
 
         mainFrame.addPanel(hueGuiPanel, "HueGui");
         mainFrame.addPanel(hueMenuePanel, "HueMenue");
