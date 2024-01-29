@@ -7,6 +7,7 @@ import teko.ch.zigbee.HueGUI.HueGui;
 import teko.ch.zigbee.HueGUI.HueMenue;
 import teko.ch.zigbee.HueGUI.MainFrame;
 import teko.ch.zigbee.baseApi.HueBridgeController;
+import teko.ch.zigbee.baseApi.jsonFile;
 import teko.ch.zigbee.baseApi.readData;
 
 import javax.swing.*;
@@ -39,6 +40,9 @@ public class HelloApplication extends Application {
         HueGui hueGuiPanel = new HueGui(mainFrame);
         HueMenue hueMenuePanel = new HueMenue();
 
+        jsonFile JsonFileWriter = new jsonFile();
+        jsonFile JsonFileReader = new jsonFile();
+
         mainFrame.addPanel(hueGuiPanel, "HueGui");
         mainFrame.addPanel(hueMenuePanel, "HueMenue");
 
@@ -53,11 +57,23 @@ public class HelloApplication extends Application {
             String bridgeBaseUrl = "http://" + Ip + "/api/";
             HueBridgeController controller = new HueBridgeController(bridgeBaseUrl, Key);
             JsonNode jsonResponse = controller.getAllLamps();
-            System.out.println(jsonResponse.toString());
+            String jsonFilePath = "lights.json"; // Specify your file path here
+
+            JsonFileWriter.writeJsonToFile(jsonResponse, jsonFilePath);
             mainFrame.switchToPanel("HueMenue");
             hueMenuePanel.updateText(String.valueOf(jsonResponse));
             hueMenuePanel.updateBackgroundColor(50, 0, 100);
             mainFrame.switchToPanel("HueMenue");
+            JsonFileWriter.updateProductBriValue("lights.json", "Pult", 0);
+
+            /// TODO how to change the who Json and send it to change the whole scene?
+            controller.setLampState(1, "on", "false");
+            controller.setLampState(1, "xyz", "[0.10,0.20]");
+            controller.setLampState(5, "xyz", "[0.10,0.20,0.00]");
+
+            controller.getLampState(1);
+            System.out.println(jsonResponse.toString());
+
 
         } else {
             System.out.println("Config file does not exist");
@@ -67,6 +83,16 @@ public class HelloApplication extends Application {
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.pack();
         mainFrame.setVisible(true);
+        try {
+            String jsonFilePath = "lights.json"; // Specify your file path here
+            JsonNode jsonData = JsonFileReader.readJsonFromFile(jsonFilePath);
+
+            // Use jsonData as needed
+            System.out.println(jsonData);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error reading JSON file.");
+        }
 
         launch();
     }

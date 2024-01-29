@@ -64,21 +64,10 @@ public class HueGui extends JPanel {
 
 
                 System.out.println("finish");
-                try {
-                    controller.setLampState(1, "on", "true");
-                    controller.setLampState(1, "xyz", "[0.00,0.00,0.00]");
+
+                mainFrame.switchToPanel("HueMenue");
 
 
-                    controller.getLampState(1);
-                    JsonNode jsonResponse = controller.getAllLamps();
-                    System.out.println(jsonResponse.toString());
-
-                    mainFrame.switchToPanel("HueMenue");
-
-
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
             }
         });
     }
