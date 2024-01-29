@@ -6,19 +6,13 @@ import javafx.stage.Stage;
 import teko.ch.zigbee.HueGUI.HueGui;
 import teko.ch.zigbee.HueGUI.HueMenue;
 import teko.ch.zigbee.HueGUI.MainFrame;
-import teko.ch.zigbee.baseApi.ConfigManager;
 import teko.ch.zigbee.baseApi.HueBridgeController;
-import teko.ch.zigbee.baseApi.hueBridgeConnector;
 import teko.ch.zigbee.baseApi.readData;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.Map;
 
 public class HelloApplication extends Application {
   //  @Override
@@ -62,6 +56,7 @@ public class HelloApplication extends Application {
             System.out.println(jsonResponse.toString());
             mainFrame.switchToPanel("HueMenue");
             hueMenuePanel.updateText(String.valueOf(jsonResponse));
+            hueMenuePanel.updateBackgroundColor(50, 0, 100);
             mainFrame.switchToPanel("HueMenue");
 
         } else {

@@ -32,6 +32,8 @@ public class HueMenue extends JPanel {
     public void updateText(String text) {
         textArea.setText(text);
     }
-
+    public void updateBackgroundColor(int r, int g, int b) {
+        HueMenuePanel.setBackground(new Color(r, g, b));
+    }
     // Additional methods...
 }
