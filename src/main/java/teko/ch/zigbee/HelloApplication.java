@@ -59,20 +59,30 @@ public class HelloApplication extends Application {
             JsonNode jsonResponse = controller.getAllLamps();
             String jsonFilePath = "lights.json"; // Specify your file path here
 
-            JsonFileWriter.writeJsonToFile(jsonResponse, jsonFilePath);
+//            JsonFileWriter.writeJsonToFile(jsonResponse, jsonFilePath);
             mainFrame.switchToPanel("HueMenue");
             hueMenuePanel.updateText(String.valueOf(jsonResponse));
             hueMenuePanel.updateBackgroundColor(50, 0, 100);
             mainFrame.switchToPanel("HueMenue");
-            JsonFileWriter.updateProductBriValue("lights.json", "Pult", 0);
+            JsonFileWriter.updateProductBriValue("lights.json", "Pult", 254);
+            try {
+                JsonFileWriter.updateProductColor("lights.json", "Pult", 0.3, 0.1);
+                JsonFileWriter.updateProductOn("lights.json", "Pult", false);
+                System.out.println("Updated 'xy' value successfully.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            controller.setAllLamps();
+
 
             /// TODO how to change the who Json and send it to change the whole scene?
-            controller.setLampState(1, "on", "false");
-            controller.setLampState(1, "xyz", "[0.10,0.20]");
-            controller.setLampState(5, "xyz", "[0.10,0.20,0.00]");
-
-            controller.getLampState(1);
-            System.out.println(jsonResponse.toString());
+//            controller.setLampState(1, "on", "true");
+//            controller.setLampState(1, "xyz", "[0.10,0.20]");
+//            controller.setLampState(5, "xyz", "[0.10,0.20,0.00]");
+//            controller.setLampState(5, "xyz", "[0.10,0.20,0.00]");
+//
+//            controller.getLampState(1);
+//            System.out.println(jsonResponse.toString());
 
 
         } else {
