@@ -61,8 +61,8 @@ public class HelloApplication extends Application {
 
 //            JsonFileWriter.writeJsonToFile(jsonResponse, jsonFilePath);
             mainFrame.switchToPanel("HueMenue");
-            hueMenuePanel.updateText(String.valueOf(jsonResponse));
-            hueMenuePanel.updateBackgroundColor(50, 0, 100);
+//            hueMenuePanel.updateText(String.valueOf(jsonResponse));
+//            hueMenuePanel.updateBackgroundColor(50, 0, 100);
             mainFrame.switchToPanel("HueMenue");
             JsonFileWriter.updateProductBriValue("lights.json", "Pult", 254);
             try {
