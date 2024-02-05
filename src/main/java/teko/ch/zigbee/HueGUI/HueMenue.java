@@ -36,10 +36,8 @@ public class HueMenue extends JPanel {
         JsonNode jsonResponse = controller.getAllLamps();
         String jsonFilePath = "lights.json"; // Specify your file path here
 
-        // Write the JSON response to a file
         JsonFileWriter.writeJsonToFile(jsonResponse, jsonFilePath);
 
-        // Assuming jsonResponse is the root node of your JSON
         if (jsonResponse.isObject()) {
             for (JsonNode lampNode : jsonResponse) {
                 String name = lampNode.get("name").asText(); // Get the lamp name
@@ -58,7 +56,6 @@ public class HueMenue extends JPanel {
                 row.add(Box.createHorizontalGlue());
                 row.add(button);
 
-                // Add row to the leftPanel, not HueMenuePanel
                 leftPanel.add(row);
             }
         }
@@ -66,7 +63,7 @@ public class HueMenue extends JPanel {
         // Right side panel for the scenes
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-        rightPanel.setBackground(Color.LIGHT_GRAY); // Different background to distinguish the areas
+        rightPanel.setBackground(Color.LIGHT_GRAY);
 
         // Create scene cards
         for (int i = 1; i <= 3; i++) {
