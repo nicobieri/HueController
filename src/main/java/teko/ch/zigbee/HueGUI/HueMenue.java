@@ -1,36 +1,66 @@
 package teko.ch.zigbee.HueGUI;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import teko.ch.zigbee.baseApi.HueBridgeController;
+import teko.ch.zigbee.baseApi.jsonFile;
+import teko.ch.zigbee.baseApi.readData;
+
 
 public class HueMenue extends JPanel {
     private JPanel HueMenuePanel;
     private JTextArea textArea; // Text area for displaying text
 
-    public HueMenue() {
+    public HueMenue() throws IOException {
         this.setLayout(new BorderLayout());
 
         // Left side panel for the lamp controls
+        jsonFile JsonFileWriter = new jsonFile();
+        jsonFile JsonFileReader = new jsonFile();
+        readData read = new readData();
+        String Ip = read.getIpAddress();
+        String Key = read.getBridgeKey();
+
+        String bridgeBaseUrl = "http://" + Ip + "/api/";
+        HueBridgeController controller = new HueBridgeController(bridgeBaseUrl, Key);
         JPanel leftPanel = new JPanel();
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
         leftPanel.setBackground(Color.WHITE);
 
-        for (int i = 1; i <= 7; i++) {
-            JPanel row = new JPanel();
-            row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
-            row.setAlignmentX(Component.LEFT_ALIGNMENT);
-            row.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-            JLabel label = new JLabel("Lampe " + i);
-            JButton button = new JButton(new ImageIcon("src/main/java/teko/ch/zigbee/assets/icons/switch-on.png"));
-            button.setBorderPainted(false);
-            button.setContentAreaFilled(false);
 
-            row.add(label);
-            row.add(Box.createHorizontalGlue());
-            row.add(button);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonResponse = controller.getAllLamps();
+        String jsonFilePath = "lights.json"; // Specify your file path here
 
-            leftPanel.add(row);
+        // Write the JSON response to a file
+        JsonFileWriter.writeJsonToFile(jsonResponse, jsonFilePath);
+
+        // Assuming jsonResponse is the root node of your JSON
+        if (jsonResponse.isObject()) {
+            for (JsonNode lampNode : jsonResponse) {
+                String name = lampNode.get("name").asText(); // Get the lamp name
+
+                JPanel row = new JPanel();
+                row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+                row.setAlignmentX(Component.LEFT_ALIGNMENT);
+                row.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+                JLabel label = new JLabel(name); // Use the actual lamp name
+                JButton button = new JButton(new ImageIcon("src/main/java/teko/ch/zigbee/assets/icons/switch-on.png"));
+                button.setBorderPainted(false);
+                button.setContentAreaFilled(false);
+
+                row.add(label);
+                row.add(Box.createHorizontalGlue());
+                row.add(button);
+
+                // Add row to the leftPanel, not HueMenuePanel
+                leftPanel.add(row);
+            }
         }
 
         // Right side panel for the scenes
@@ -64,5 +94,7 @@ public class HueMenue extends JPanel {
 //            HueMenuePanel.setBackground(new Color(r, g, b));
 //        }
         // Additional methods...
+
+        controller.setAllLamps();
     }
 }
