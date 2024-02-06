@@ -2,56 +2,92 @@ package teko.ch.zigbee.HueGUI;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import teko.ch.zigbee.baseApi.HueBridgeController;
+import teko.ch.zigbee.baseApi.readData;
+import teko.ch.zigbee.components.CIEColorSlider;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import teko.ch.zigbee.baseApi.HueBridgeController;
-import teko.ch.zigbee.baseApi.jsonFile;
-import teko.ch.zigbee.baseApi.readData;
-
+import java.lang.reflect.Array;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class HueMenue extends JPanel {
-    private JPanel HueMenuePanel;
+    private JPanel leftPanel; // Use directly as instance variable
+    private JPanel rightPanel; // Use directly as instance variable
     private JTextArea textArea; // Text area for displaying text
+    private HueBridgeController controller; // Instance variable for controller
 
     public HueMenue() throws IOException {
         this.setLayout(new BorderLayout());
 
-        // Left side panel for the lamp controls
-        jsonFile JsonFileWriter = new jsonFile();
-        jsonFile JsonFileReader = new jsonFile();
-        readData read = new readData();
-        String Ip = read.getIpAddress();
-        String Key = read.getBridgeKey();
+        initializeController();
+        initializeLeftPanel();
+        initializeRightPanel();
 
-        String bridgeBaseUrl = "http://" + Ip + "/api/";
-        HueBridgeController controller = new HueBridgeController(bridgeBaseUrl, Key);
-        JPanel leftPanel = new JPanel();
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
+        splitPane.setDividerLocation(0.7);
+        splitPane.setResizeWeight(0.7);
+
+        this.add(splitPane, BorderLayout.CENTER);
+
+        controller.setAllLamps();
+    }
+
+    private void initializeController() throws IOException {
+        readData read = new readData();
+        String ip = read.getIpAddress();
+        String key = read.getBridgeKey();
+        String bridgeBaseUrl = "http://" + ip + "/api/";
+        controller = new HueBridgeController(bridgeBaseUrl, key);
+    }
+
+    private void initializeLeftPanel() throws IOException {
+        leftPanel = new JPanel();
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
         leftPanel.setBackground(Color.WHITE);
 
+        updateLeftPanel();
+    }
 
+    private void updateLeftPanel() throws IOException {
+        leftPanel.removeAll(); // Clear existing components
 
-        ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonResponse = controller.getAllLamps();
-        String jsonFilePath = "lights.json"; // Specify your file path here
-
-        JsonFileWriter.writeJsonToFile(jsonResponse, jsonFilePath);
-
         if (jsonResponse.isObject()) {
             for (JsonNode lampNode : jsonResponse) {
-                String name = lampNode.get("name").asText(); // Get the lamp name
+                String name = lampNode.get("name").asText();
+                boolean on = lampNode.get("state").get("on").asBoolean();
 
                 JPanel row = new JPanel();
-                row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
-                row.setAlignmentX(Component.LEFT_ALIGNMENT);
-                row.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-                JLabel label = new JLabel(name); // Use the actual lamp name
-                JButton button = new JButton(new ImageIcon("src/main/java/teko/ch/zigbee/assets/icons/switch-on.png"));
+                JLabel label = new JLabel(name);
+                String iconName = on ? "switch-on.png" : "switch-off.png";
+                JButton button = new JButton(new ImageIcon("src/main/java/teko/ch/zigbee/assets/icons/" + iconName));
                 button.setBorderPainted(false);
                 button.setContentAreaFilled(false);
 
+                // Toggle state on button click
+                button.addActionListener(e -> toggleLampState(name, !on));
+
+                CIEColorSlider colorSlider = new CIEColorSlider(JSlider.HORIZONTAL, 0, 100, getInitialSliderValue(lampNode)); // Assuming 0-100 range for simplicity
+                colorSlider.addChangeListener(e -> {
+                    if (!colorSlider.getValueIsAdjusting()) {
+                        double[] xyColor = convertSliderValueToXY(colorSlider.getValue()); // Implement this method
+                        System.out.println(Arrays.toString(xyColor));
+                        updateLampColor(name, xyColor);
+                    }
+                });
+
+                row.add(colorSlider);
                 row.add(label);
                 row.add(Box.createHorizontalGlue());
                 row.add(button);
@@ -60,38 +96,207 @@ public class HueMenue extends JPanel {
             }
         }
 
-        // Right side panel for the scenes
-        JPanel rightPanel = new JPanel();
+        leftPanel.revalidate();
+        leftPanel.repaint();
+    }
+
+    private void initializeRightPanel() throws IOException {
+        rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
         rightPanel.setBackground(Color.LIGHT_GRAY);
 
-        // Create scene cards
-        for (int i = 1; i <= 3; i++) {
-            JPanel card = new JPanel();
-            card.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createRaisedBevelBorder(),
-                    BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-            card.add(new JLabel("Szene " + i));
-            rightPanel.add(card);
-            rightPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Add space between cards
-        }
-
-        // Create a split pane to separate the left and right panels
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
-        splitPane.setDividerLocation(0.7); // Set the divider at 70% of the width
-        splitPane.setResizeWeight(0.7); // The left side gets the extra space on resize
-
-        // Add the split pane to the main panel
-        this.add(splitPane, BorderLayout.CENTER);
-        // Method to update the text area content
-//        public void updateText (String text){
-//            textArea.setText(text);
-//        }
-//        public void updateBackgroundColor ( int r, int g, int b){
-//            HueMenuePanel.setBackground(new Color(r, g, b));
-//        }
-        // Additional methods...
-
-        controller.setAllLamps();
+        updateRightPanel();
     }
+    private void updateRightPanel() throws IOException {
+        rightPanel.removeAll();
+        JButton saveButton = new JButton("Save");
+        saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        saveButton.addActionListener(e -> {
+            String newName = JOptionPane.showInputDialog(HueMenue.this, "Enter new file name:", "Save As", JOptionPane.PLAIN_MESSAGE);
+            if (newName != null && !newName.trim().isEmpty()) {
+                copyFile("lights.json", newName.trim() + ".json");
+            }
+        });
+        rightPanel.add(saveButton);
+
+        rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        List<String> jsonFiles = getJsonFileNames("");
+        jsonFiles.forEach(fileName -> {
+            JButton sceneButton = new JButton(fileName);
+            sceneButton.addActionListener(e -> copySceneToLights(fileName + ".json", "lights.json"));
+            rightPanel.add(sceneButton);
+            rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        });
+
+        rightPanel.revalidate();
+        rightPanel.repaint();
+    }
+
+    private void copySceneToLights(String sourceFileName, String destFileName) {
+        try {
+            Files.copy(Paths.get(sourceFileName), Paths.get(destFileName), StandardCopyOption.REPLACE_EXISTING);
+            JOptionPane.showMessageDialog(this, "Loaded scene: " + sourceFileName, "Success", JOptionPane.INFORMATION_MESSAGE);
+
+            controller.setAllLamps();
+            updateRightPanel();
+            updateLeftPanel(); // Refresh left panel with new lamp states
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Error loading the Scene: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
+    }
+
+    private void copyFile(String sourceFileName, String destFileName) {
+        try {
+            Files.copy(Paths.get(sourceFileName), Paths.get(destFileName), StandardCopyOption.REPLACE_EXISTING);
+            JOptionPane.showMessageDialog(this, "Scene Name: " + destFileName, "Success", JOptionPane.INFORMATION_MESSAGE);
+
+            updateLeftPanel();
+            updateRightPanel();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Error saving the Scene: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
+    }
+
+    private List<String> getJsonFileNames(String directoryPath) {
+        try (Stream<Path> walk = Files.walk(Paths.get(directoryPath))) {
+            return walk.filter(Files::isRegularFile)
+                    .filter(p -> p.toString().endsWith(".json"))
+                    .map(p -> p.getFileName().toString())
+                    .filter(filename -> !filename.equals("lights.json"))
+                    .map(filename -> filename.replaceAll("\\.json$", ""))
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    private void toggleLampState(String lampName, boolean newState) {
+        try {
+            Path path = Paths.get("lights.json");
+            String content = new String(Files.readAllBytes(path));
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(content);
+
+            // Assuming your JSON structure, find the lamp and update its state
+            if (root.isObject()) {
+                for (JsonNode lampNode : root) {
+                    String name = lampNode.get("name").asText();
+                    if (name.equals(lampName)) {
+                        ((ObjectNode) lampNode.get("state")).put("on", newState);
+                        break;
+                    }
+                }
+            }
+
+            // Write the updated JSON back to lights.json
+            Files.write(path, mapper.writeValueAsBytes(root));
+
+            // Update lamps via controller
+            controller.setAllLamps(); // Ensure this method reads from lights.json and updates the lamps
+
+            // Refresh the UI
+            updateLeftPanel();
+            updateRightPanel();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error updating the lamp state: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    private void updateLampColor(String lampName, double[] xyColor) {
+        try {
+            Path path = Paths.get("lights.json");
+            String content = new String(Files.readAllBytes(path));
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(content);
+
+            // Find the lamp by name and update its xy color
+            boolean found = false;
+            for (JsonNode node : root) {
+                if (node.path("name").asText().equals(lampName)) {
+                    // This is your lamp node
+                    ObjectNode stateNode = (ObjectNode) node.path("state");
+                    // Replace the xy array
+                    stateNode.putArray("xy").add(xyColor[0]).add(xyColor[1]);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                // Write the updated JSON back to the file
+                Files.write(path, mapper.writeValueAsBytes(root));
+                // Trigger an update to the lamps
+                controller.setAllLamps();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error updating the lamp color: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+//        try {
+//            Path path = Paths.get("lights.json");
+//            String content = new String(Files.readAllBytes(path));
+//            ObjectMapper mapper = new ObjectMapper();
+//            JsonNode root = mapper.readTree(content);
+//
+//            // Assuming your JSON structure, find the lamp and update its color
+//            if (root.isObject()) {
+//                JsonNode lampNode = root.path(lampId);
+//                if (!lampNode.isMissingNode()) {
+//                    ((ObjectNode) lampNode.get("state")).putArray("xy").addAll(Arrays.asList(mapper.valueToTree(xyColor)));
+//                }
+//            }
+//
+//            // Write the updated JSON back to lights.json
+//            Files.write(path, mapper.writeValueAsBytes(root));
+//
+//            // Send the update to the lamp via the controller
+//            controller.setAllLamps();
+//            // controller.setLampState(lampId, xyColor); // You will need to implement this method
+//
+//            // Refresh the UI
+//            updateLeftPanel();
+
+
+    private int getInitialSliderValue(JsonNode lampNode) {
+        JsonNode xyNode = lampNode.get("state").get("xy");
+        if (xyNode.isArray() && xyNode.size() == 2) {
+            double x = xyNode.get(0).asDouble();
+            double y = xyNode.get(1).asDouble();
+
+            // Example mapping: let's say your slider linearly maps from x=0.1, y=0.1 (min slider value)
+            // to x=0.8, y=0.8 (max slider value). You need to adjust these values based on your color model.
+            double minX = 0.1, minY = 0.1, maxX = 0.8, maxY = 0.8;
+
+            // Normalize the current xy value to the slider's range
+            double normalizedX = (x - minX) / (maxX - minX);
+            double normalizedY = (y - minY) / (maxY - minY);
+
+            // Assuming a simple average of normalized x and y for demonstration purposes
+            int sliderValue = (int) ((normalizedX + normalizedY) / 2 * 100);
+
+            return sliderValue;
+        }
+        return 50; // Default to middle if there's no color or it's in an unexpected format
+    }
+
+    private double[] convertSliderValueToXY(int sliderValue) {
+        double normalizedValue = sliderValue / 100.0;
+
+        // Example mapping based on the same assumptions as above
+        double minX = 0.1, minY = 0.1, maxX = 0.8, maxY = 0.8;
+
+        // Convert the normalized slider value back to xy values
+        double x = normalizedValue * (maxX - minX) + minX;
+        double y = normalizedValue * (maxY - minY) + minY;
+
+        // Ensure x and y are within the expected range
+        x = Math.max(minX, Math.min(x, maxX));
+        y = Math.max(minY, Math.min(y, maxY));
+
+        return new double[]{x, y};
+    }
+
 }

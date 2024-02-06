@@ -27,6 +27,7 @@ public class HueBridgeController {
         this.bridgeBaseUrl = bridgeBaseUrl;
         this.apiKey = apiKey;
     }
+
     public void setAllLamps() throws IOException {
         Path path = Paths.get("lights.json");
         String yourJsonString = Files.readString(path);
