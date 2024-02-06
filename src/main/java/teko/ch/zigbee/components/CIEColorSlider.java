@@ -34,7 +34,7 @@ public class CIEColorSlider extends JSlider {
         int dotY = getHeight() / 2;
 
         // Use a fixed thumb offset based on the slider's height or a visually fitting value
-        int thumbOffset = 8; // This is an assumed value; adjust as needed for your UI
+        int thumbOffset = 10; // This is an assumed value; adjust as needed for your UI
 
         // Adjust dot position to align with the slider's thumb position
         dotX -= thumbOffset;
@@ -45,7 +45,7 @@ public class CIEColorSlider extends JSlider {
 
         // Set color and draw the dot
         g2d.setColor(Color.BLACK); // Set the dot color for visibility
-        g2d.fillOval(dotX, dotY - 5, 10, 10); // Adjust size as needed
+        g2d.fillOval(dotX, dotY - 7, 14, 14); // Adjust size as needed
 
         g2d.dispose();
     }

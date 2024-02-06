@@ -235,29 +235,6 @@ public class HueMenue extends JPanel {
             JOptionPane.showMessageDialog(this, "Error updating the lamp color: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-//        try {
-//            Path path = Paths.get("lights.json");
-//            String content = new String(Files.readAllBytes(path));
-//            ObjectMapper mapper = new ObjectMapper();
-//            JsonNode root = mapper.readTree(content);
-//
-//            // Assuming your JSON structure, find the lamp and update its color
-//            if (root.isObject()) {
-//                JsonNode lampNode = root.path(lampId);
-//                if (!lampNode.isMissingNode()) {
-//                    ((ObjectNode) lampNode.get("state")).putArray("xy").addAll(Arrays.asList(mapper.valueToTree(xyColor)));
-//                }
-//            }
-//
-//            // Write the updated JSON back to lights.json
-//            Files.write(path, mapper.writeValueAsBytes(root));
-//
-//            // Send the update to the lamp via the controller
-//            controller.setAllLamps();
-//            // controller.setLampState(lampId, xyColor); // You will need to implement this method
-//
-//            // Refresh the UI
-//            updateLeftPanel();
 
 
     private int getInitialSliderValue(JsonNode lampNode) {
@@ -283,18 +260,30 @@ public class HueMenue extends JPanel {
     }
 
     private double[] convertSliderValueToXY(int sliderValue) {
-        double normalizedValue = sliderValue / 100.0;
+        double normalizedValue = sliderValue / 10.0;
 
-        // Example mapping based on the same assumptions as above
-        double minX = 0.1, minY = 0.1, maxX = 0.8, maxY = 0.8;
+        System.out.println(normalizedValue);
+        double x;
+        if (normalizedValue >= 5) {
+            // When normalized value goes from 0 to 0.5, y goes from 0.8 to 0.0
+            x = (0.7 / 5) * normalizedValue;
+            x = x / 2;
+        } else {
+            // When normalized value goes from 0.5 to 1, y goes from 0.0 back to 0.8
+            x = (0.7 / 5) * (normalizedValue);
+        }
 
-        // Convert the normalized slider value back to xy values
-        double x = normalizedValue * (maxX - minX) + minX;
-        double y = normalizedValue * (maxY - minY) + minY;
-
-        // Ensure x and y are within the expected range
-        x = Math.max(minX, Math.min(x, maxX));
-        y = Math.max(minY, Math.min(y, maxY));
+        // y starts at 0.8, goes down to 0.0 at the midpoint (x = 0.35), then back to 0.8
+        double y;
+        if (normalizedValue <= 5) {
+            // When normalized value goes from 0 to 0.5, y goes from 0.8 to 0.0
+            y = (0.8 / 5) * normalizedValue;
+        } else {
+            /// TODO devrese the number
+            // When normalized value goes from 0.5 to 1, y goes from 0.0 back to 0.8
+            y = (0.8 / 5) / (normalizedValue * 2);
+            y = (y * 10 * 8) / 2;
+        }
 
         return new double[]{x, y};
     }
