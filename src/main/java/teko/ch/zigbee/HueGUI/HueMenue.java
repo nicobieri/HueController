@@ -78,12 +78,12 @@ public class HueMenue extends JPanel {
                 // Toggle state on button click
                 button.addActionListener(e -> toggleLampState(name, !on));
 
-                CIEColorSlider colorSlider = new CIEColorSlider(JSlider.HORIZONTAL, 0, 100, getInitialSliderValue(lampNode)); // Assuming 0-100 range for simplicity
-                colorSlider.addChangeListener(e -> {
-                    if (!colorSlider.getValueIsAdjusting()) {
-                        double[] xyColor = convertSliderValueToXY(colorSlider.getValue()); // Implement this method
-                        System.out.println(Arrays.toString(xyColor));
-                        updateLampColor(name, xyColor);
+                CIEColorSlider colorSlider = new CIEColorSlider(new CIEColorSlider.ColorPickerListener(){
+                    @Override
+                    public void onColorSelected(double x, double y) {
+                        // Verwenden Sie hier die X- und Y-Werte, um die Lampe zu aktualisieren
+                        System.out.println("Ausgewählte Farbe: X=" + x + ", Y=" + y);
+                        updateLampColor(name, x, y);
                     }
                 });
 
@@ -204,7 +204,7 @@ public class HueMenue extends JPanel {
             JOptionPane.showMessageDialog(this, "Error updating the lamp state: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    private void updateLampColor(String lampName, double[] xyColor) {
+    private void updateLampColor(String lampName, double x , double y) {
         try {
             Path path = Paths.get("lights.json");
             String content = new String(Files.readAllBytes(path));
@@ -218,7 +218,7 @@ public class HueMenue extends JPanel {
                     // This is your lamp node
                     ObjectNode stateNode = (ObjectNode) node.path("state");
                     // Replace the xy array
-                    stateNode.putArray("xy").add(xyColor[0]).add(xyColor[1]);
+                    stateNode.putArray("xy").add(x).add(y);
                     found = true;
                     break;
                 }
@@ -234,58 +234,6 @@ public class HueMenue extends JPanel {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error updating the lamp color: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-
-    private int getInitialSliderValue(JsonNode lampNode) {
-        JsonNode xyNode = lampNode.get("state").get("xy");
-        if (xyNode.isArray() && xyNode.size() == 2) {
-            double x = xyNode.get(0).asDouble();
-            double y = xyNode.get(1).asDouble();
-
-            // Example mapping: let's say your slider linearly maps from x=0.1, y=0.1 (min slider value)
-            // to x=0.8, y=0.8 (max slider value). You need to adjust these values based on your color model.
-            double minX = 0.1, minY = 0.1, maxX = 0.8, maxY = 0.8;
-
-            // Normalize the current xy value to the slider's range
-            double normalizedX = (x - minX) / (maxX - minX);
-            double normalizedY = (y - minY) / (maxY - minY);
-
-            // Assuming a simple average of normalized x and y for demonstration purposes
-            int sliderValue = (int) ((normalizedX + normalizedY) / 2 * 100);
-
-            return sliderValue;
-        }
-        return 50; // Default to middle if there's no color or it's in an unexpected format
-    }
-
-    private double[] convertSliderValueToXY(int sliderValue) {
-        double normalizedValue = sliderValue / 10.0;
-
-        System.out.println(normalizedValue);
-        double x;
-        if (normalizedValue >= 5) {
-            // When normalized value goes from 0 to 0.5, y goes from 0.8 to 0.0
-            x = (0.7 / 5) * normalizedValue;
-            x = x / 2;
-        } else {
-            // When normalized value goes from 0.5 to 1, y goes from 0.0 back to 0.8
-            x = (0.7 / 5) * (normalizedValue);
-        }
-
-        // y starts at 0.8, goes down to 0.0 at the midpoint (x = 0.35), then back to 0.8
-        double y;
-        if (normalizedValue <= 5) {
-            // When normalized value goes from 0 to 0.5, y goes from 0.8 to 0.0
-            y = (0.8 / 5) * normalizedValue;
-        } else {
-            /// TODO devrese the number
-            // When normalized value goes from 0.5 to 1, y goes from 0.0 back to 0.8
-            y = (0.8 / 5) / (normalizedValue * 2);
-            y = (y * 10 * 8) / 2;
-        }
-
-        return new double[]{x, y};
     }
 
 }

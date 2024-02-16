@@ -1,52 +1,97 @@
 package teko.ch.zigbee.components;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Point2D;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+// TODO x y values default values of the lamp status and slo the xy value in the picker!!
 
 public class CIEColorSlider extends JSlider {
+    private double xValue = 0.5; // Default value for X
+    private double yValue = 0.5; // Default value for Y
+    private final int circleDiameter = 75; // Diameter of the color circle reduced to a quarter
+    private final ColorPickerListener listener; // Listener interface for changes
+    private BufferedImage backgroundImage;
+    private Point cursorPosition; // Position of the cursor (black dot)
 
-    public CIEColorSlider(int orientation, int min, int max, int value) {
-        super(orientation, min, max, value);
+    public interface ColorPickerListener {
+        void onColorSelected(double x, double y);
+    }
+
+    public CIEColorSlider(ColorPickerListener listener) {
+        this.listener = listener;
+        setPreferredSize(new Dimension(circleDiameter, circleDiameter));
+        cursorPosition = new Point(circleDiameter / 2, circleDiameter / 2); // Initialize cursor in the center
+        MouseAdapter ma = new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                updateCursorPosition(e.getX(), e.getY());
+            }
+        };
+        addMouseListener(ma);
+
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                updateCursorPosition(e.getX(), e.getY());
+            }
+        });
+        try {
+            backgroundImage = ImageIO.read(new File("src/main/java/teko/ch/zigbee/assets/icons/colorPicker.png")); // Replace with your image path
+        } catch (IOException e) {
+            e.printStackTrace();
+            backgroundImage = null;
+        }
+    }
+
+    private void updateCursorPosition(int mouseX, int mouseY) {
+        double radius = circleDiameter / 2.0;
+        double centerX = getWidth() / 2.0;
+        double centerY = getHeight() / 2.0;
+
+        double dx = mouseX - centerX;
+        double dy = mouseY - centerY;
+        double distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance <= radius) {
+            cursorPosition.setLocation(mouseX, mouseY); // Update cursor position
+            this.xValue = (dx + radius) / (2 * radius);
+            this.yValue = (dy + radius) / (2 * radius);
+
+            if (listener != null) {
+                listener.onColorSelected(xValue, yValue);
+            }
+        } else {
+            double scaleFactor = radius / distance;
+            cursorPosition.setLocation(centerX + dx * scaleFactor, centerY + dy * scaleFactor);
+        }
+
+        repaint();
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g.create();
+        Graphics2D g2 = (Graphics2D) g;
 
-        // Draw the gradient
-        LinearGradientPaint lgp = new LinearGradientPaint(
-                new Point2D.Float(0, getHeight() / 2f),
-                new Point2D.Float(getWidth(), getHeight() / 2f),
-                new float[]{0f, 0.2f, 0.4f, 0.6f, 0.8f, 1f},
-                new Color[]{Color.WHITE, Color.YELLOW, Color.GREEN, Color.BLUE, Color.RED, Color.BLACK}
-        );
+        // Draw the background image, clipped to a circle
+        if (backgroundImage != null) {
+            Shape clip = new Ellipse2D.Double(0, 0, circleDiameter, circleDiameter);
+            g2.setClip(clip);
+            g2.drawImage(backgroundImage, 0, 0, circleDiameter, circleDiameter, this);
+            g2.setClip(null);
+        }
 
-        g2d.setPaint(lgp);
-        g2d.fillRect(0, 0, getWidth(), getHeight());
-
-        // Calculate the dot's position
-        int sliderValue = getValue();
-        int trackWidth = getWidth() - getInsets().left - getInsets().right;
-        double percent = (double) sliderValue / (getMaximum() - getMinimum());
-        int dotX = (int) (percent * trackWidth + getInsets().left);
-        int dotY = getHeight() / 2;
-
-        // Use a fixed thumb offset based on the slider's height or a visually fitting value
-        int thumbOffset = 10; // This is an assumed value; adjust as needed for your UI
-
-        // Adjust dot position to align with the slider's thumb position
-        dotX -= thumbOffset;
-
-        // Ensure the dot stays within the slider bounds
-        dotX = Math.max(dotX, getInsets().left);
-        dotX = Math.min(dotX, getWidth() - getInsets().right - thumbOffset * 2);
-
-        // Set color and draw the dot
-        g2d.setColor(Color.BLACK); // Set the dot color for visibility
-        g2d.fillOval(dotX, dotY - 7, 14, 14); // Adjust size as needed
-
-        g2d.dispose();
+        // Draw the cursor (black dot)
+        int cursorDiameter = 10; // Size of the cursor dot
+        g2.setColor(Color.BLACK);
+        g2.fillOval(cursorPosition.x - cursorDiameter / 2, cursorPosition.y - cursorDiameter / 2, cursorDiameter, cursorDiameter);
     }
 }
