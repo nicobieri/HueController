@@ -138,13 +138,32 @@ public class HueMenue extends JPanel {
                 copyFile("lights.json", newName.trim() + ".json");
             }
         });
+        saveButton.setOpaque(true);
+        saveButton.setBorderPainted(false);
+        saveButton.setBackground(new Color(0, 153, 0)); // A green color
+        saveButton.setForeground(Color.WHITE); // Text color to white
+        saveButton.setFocusPainted(false);
+        saveButton.setFont(new Font("Tahoma", Font.BOLD, 12));
+        saveButton.setPreferredSize(new Dimension(100, 40)); // Adjust the size as needed
+        saveButton.setMaximumSize(saveButton.getPreferredSize());
         rightPanel.add(saveButton);
 
         rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        Color darkGrey = new Color(50, 50, 50);
         List<String> jsonFiles = getJsonFileNames("");
         jsonFiles.forEach(fileName -> {
             JButton sceneButton = new JButton(fileName);
             sceneButton.addActionListener(e -> copySceneToLights(fileName + ".json", "lights.json"));
+            sceneButton.setOpaque(true);
+            sceneButton.setBorderPainted(false);
+            sceneButton.setBackground(darkGrey);
+            sceneButton.setForeground(Color.WHITE);
+            sceneButton.setFocusPainted(false);
+            sceneButton.setFont(new Font("Tahoma", Font.BOLD, 12));
+            sceneButton.setPreferredSize(new Dimension(100, 40));
+            sceneButton.setMaximumSize(sceneButton.getPreferredSize());
+
             rightPanel.add(sceneButton);
             rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         });
