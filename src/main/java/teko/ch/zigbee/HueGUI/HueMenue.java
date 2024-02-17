@@ -2,6 +2,7 @@ package teko.ch.zigbee.HueGUI;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import teko.ch.zigbee.baseApi.HueBridgeController;
 import teko.ch.zigbee.baseApi.readData;
@@ -10,12 +11,12 @@ import teko.ch.zigbee.components.CIEColorSlider;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.lang.reflect.Array;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -66,6 +67,8 @@ public class HueMenue extends JPanel {
             for (JsonNode lampNode : jsonResponse) {
                 String name = lampNode.get("name").asText();
                 boolean on = lampNode.get("state").get("on").asBoolean();
+                double x = lampNode.get("state").get("xy").get(0).asDouble();
+                double y = lampNode.get("state").get("xy").get(1).asDouble();
 
                 JPanel row = new JPanel();
 
@@ -78,17 +81,31 @@ public class HueMenue extends JPanel {
                 // Toggle state on button click
                 button.addActionListener(e -> toggleLampState(name, !on));
 
-                CIEColorSlider colorSlider = new CIEColorSlider(new CIEColorSlider.ColorPickerListener(){
-                    @Override
-                    public void onColorSelected(double x, double y) {
-                        // Verwenden Sie hier die X- und Y-Werte, um die Lampe zu aktualisieren
-                        System.out.println("Ausgewählte Farbe: X=" + x + ", Y=" + y);
-                        updateLampColor(name, x, y);
+                CIEColorSlider colorSlider = new CIEColorSlider((x1, y1) -> {
+                    updateLampColor(name, x1, y1);
+                });
+                colorSlider.setInitialValues(x, y);
+
+                int maxBrightness = 254; // Maximum brightness value for Hue lamps
+                int minBrightness = 0; // Minimum brightness value
+                int currentBrightness = lampNode.get("state").get("bri").asInt(); // Get current brightness
+                JSlider brightnessSlider = new JSlider(JSlider.VERTICAL, minBrightness, maxBrightness, currentBrightness);
+                brightnessSlider.setInverted(false); // Invert the slider so that up is more brightness
+
+                Dimension dim = brightnessSlider.getPreferredSize();
+                brightnessSlider.setPreferredSize(new Dimension(dim.width, dim.height / 2)); // Set height to half
+// Add change listener to update brightness
+                brightnessSlider.addChangeListener(e -> {
+                    if (!brightnessSlider.getValueIsAdjusting()) {
+                        int newBrightness = brightnessSlider.getValue();
+                        updateLampBrightness(name, newBrightness);
                     }
                 });
 
-                row.add(colorSlider);
+
                 row.add(label);
+                row.add(brightnessSlider);
+                row.add(colorSlider);
                 row.add(Box.createHorizontalGlue());
                 row.add(button);
 
@@ -204,12 +221,16 @@ public class HueMenue extends JPanel {
             JOptionPane.showMessageDialog(this, "Error updating the lamp state: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    private void updateLampColor(String lampName, double x , double y) {
+    private void updateLampColor(String lampName, double x, double y) {
         try {
             Path path = Paths.get("lights.json");
             String content = new String(Files.readAllBytes(path));
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(content);
+
+            // Convert doubles to BigDecimals with 2 decimal places
+            BigDecimal xValue = new BigDecimal(x).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal yValue = new BigDecimal(y).setScale(2, RoundingMode.HALF_UP);
 
             // Find the lamp by name and update its xy color
             boolean found = false;
@@ -218,7 +239,10 @@ public class HueMenue extends JPanel {
                     // This is your lamp node
                     ObjectNode stateNode = (ObjectNode) node.path("state");
                     // Replace the xy array
-                    stateNode.putArray("xy").add(x).add(y);
+                    ArrayNode xyArray = mapper.createArrayNode();
+                    xyArray.add(xValue.doubleValue());
+                    xyArray.add(yValue.doubleValue());
+                    stateNode.set("xy", xyArray);
                     found = true;
                     break;
                 }
@@ -235,5 +259,34 @@ public class HueMenue extends JPanel {
             JOptionPane.showMessageDialog(this, "Error updating the lamp color: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+    private void updateLampBrightness(String lampName, int brightness) {
+        try {
+            Path path = Paths.get("lights.json");
+            String content = new String(Files.readAllBytes(path));
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(content);
 
+            // Find the lamp by name and update its brightness
+            boolean found = false;
+            for (JsonNode node : root) {
+                if (node.path("name").asText().equals(lampName)) {
+                    // This is your lamp node
+                    ObjectNode stateNode = (ObjectNode) node.path("state");
+                    stateNode.put("bri", brightness);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found) {
+                // Write the updated JSON back to the file
+                Files.write(path, mapper.writeValueAsBytes(root));
+                // Trigger an update to the lamps
+                controller.setAllLamps();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error updating the lamp brightness: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 }

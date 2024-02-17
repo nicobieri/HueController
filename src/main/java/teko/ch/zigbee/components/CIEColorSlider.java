@@ -51,26 +51,31 @@ public class CIEColorSlider extends JSlider {
         }
     }
 
-    private void updateCursorPosition(int mouseX, int mouseY) {
+    private void updateCursorPosition(int x, int y) {
+        // Ensure the position is within the circle's bounds
         double radius = circleDiameter / 2.0;
         double centerX = getWidth() / 2.0;
         double centerY = getHeight() / 2.0;
 
-        double dx = mouseX - centerX;
-        double dy = mouseY - centerY;
+        double dx = x - centerX;
+        double dy = y - centerY;
         double distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance <= radius) {
-            cursorPosition.setLocation(mouseX, mouseY); // Update cursor position
-            this.xValue = (dx + radius) / (2 * radius);
-            this.yValue = (dy + radius) / (2 * radius);
+        if (distance > radius) {
+            double angle = Math.atan2(dy, dx);
+            dx = radius * Math.cos(angle);
+            dy = radius * Math.sin(angle);
+            x = (int)(centerX + dx);
+            y = (int)(centerY + dy);
+        }
 
-            if (listener != null) {
-                listener.onColorSelected(xValue, yValue);
-            }
-        } else {
-            double scaleFactor = radius / distance;
-            cursorPosition.setLocation(centerX + dx * scaleFactor, centerY + dy * scaleFactor);
+        cursorPosition.setLocation(x, y);
+        // Convert back to x and y values in the color space
+        this.xValue = (x - radius) / (2 * radius);
+        this.yValue = (radius - y) / (2 * radius);
+
+        if (listener != null) {
+            listener.onColorSelected(xValue, yValue);
         }
 
         repaint();
@@ -94,4 +99,20 @@ public class CIEColorSlider extends JSlider {
         g2.setColor(Color.BLACK);
         g2.fillOval(cursorPosition.x - cursorDiameter / 2, cursorPosition.y - cursorDiameter / 2, cursorDiameter, cursorDiameter);
     }
+    public void setInitialValues(double x, double y) {
+        this.xValue = x;
+        this.yValue = y;
+        // Convert x and y to screen coordinates and update cursorPosition
+        double radius = circleDiameter / 2.0;
+        // Assuming x and y are normalized (0 to 1), scale them to the circle's diameter
+        int xPos = (int) (xValue * circleDiameter);
+        int yPos = (int) ((1 - yValue) * circleDiameter); // Inverting y because screen coordinates are flipped
+
+        // Adjust position to be relative to the circle's center
+        xPos = (int) (radius + (xPos - radius));
+        yPos = (int) (radius - (yPos - radius));
+
+        updateCursorPosition(xPos, yPos);
+    }
+
 }
