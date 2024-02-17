@@ -51,31 +51,26 @@ public class CIEColorSlider extends JSlider {
         }
     }
 
-    private void updateCursorPosition(int x, int y) {
-        // Ensure the position is within the circle's bounds
+    private void updateCursorPosition(int mouseX, int mouseY) {
         double radius = circleDiameter / 2.0;
         double centerX = getWidth() / 2.0;
         double centerY = getHeight() / 2.0;
 
-        double dx = x - centerX;
-        double dy = y - centerY;
+        double dx = mouseX - centerX;
+        double dy = mouseY - centerY;
         double distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance > radius) {
-            double angle = Math.atan2(dy, dx);
-            dx = radius * Math.cos(angle);
-            dy = radius * Math.sin(angle);
-            x = (int)(centerX + dx);
-            y = (int)(centerY + dy);
-        }
+        if (distance <= radius) {
+            cursorPosition.setLocation(mouseX, mouseY); // Update cursor position
+            this.xValue = (dx + radius) / (2 * radius);
+            this.yValue = (dy + radius) / (2 * radius);
 
-        cursorPosition.setLocation(x, y);
-        // Convert back to x and y values in the color space
-        this.xValue = (x - radius) / (2 * radius);
-        this.yValue = (radius - y) / (2 * radius);
-
-        if (listener != null) {
-            listener.onColorSelected(xValue, yValue);
+            if (listener != null) {
+                listener.onColorSelected(xValue, yValue);
+            }
+        } else {
+            double scaleFactor = radius / distance;
+            cursorPosition.setLocation(centerX + dx * scaleFactor, centerY + dy * scaleFactor);
         }
 
         repaint();
