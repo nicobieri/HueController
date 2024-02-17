@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.awt.Color.WHITE;
+
 public class HueMenue extends JPanel {
     private JPanel leftPanel; // Use directly as instance variable
     private JPanel rightPanel; // Use directly as instance variable
@@ -54,14 +56,13 @@ public class HueMenue extends JPanel {
     private void initializeLeftPanel() throws IOException {
         leftPanel = new JPanel();
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-        leftPanel.setBackground(Color.WHITE);
+        leftPanel.setBackground(Color.decode("#212630"));
 
         updateLeftPanel();
     }
 
     private void updateLeftPanel() throws IOException {
         leftPanel.removeAll(); // Clear existing components
-
         JsonNode jsonResponse = controller.getAllLamps();
         if (jsonResponse.isObject()) {
             for (JsonNode lampNode : jsonResponse) {
@@ -71,8 +72,10 @@ public class HueMenue extends JPanel {
                 double y = lampNode.get("state").get("xy").get(1).asDouble();
 
                 JPanel row = new JPanel();
+                row.setBackground(Color.decode("#212630"));
 
                 JLabel label = new JLabel(name);
+                label.setForeground(Color.WHITE);
 
                 String iconName = on ? "switch-on.png" : "switch-off.png";
                 JButton button = new JButton(new ImageIcon("src/main/java/teko/ch/zigbee/assets/icons/" + iconName));
@@ -88,14 +91,15 @@ public class HueMenue extends JPanel {
                     updateLampColor(name, x1, y1);
                 });
                 colorSlider.setInitialValues(x, y);
+                colorSlider.setBackground(Color.decode("#212630"));
 
                 // Create brightness slider
                 int maxBrightness = 254; // Maximum brightness value for Hue lamps
                 int minBrightness = 0; // Minimum brightness value
                 int currentBrightness = lampNode.get("state").get("bri").asInt(); // Get current brightness
                 JSlider brightnessSlider = new JSlider(JSlider.HORIZONTAL, minBrightness, maxBrightness, currentBrightness);
+                brightnessSlider.setBackground(Color.decode("#212630"));
 
-                // Add change listener to brightness slider
                 brightnessSlider.addChangeListener(e -> {
                     if (!brightnessSlider.getValueIsAdjusting()) {
                         int newBrightness = brightnessSlider.getValue();
@@ -124,16 +128,16 @@ public class HueMenue extends JPanel {
     private void initializeRightPanel() throws IOException {
         rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-        rightPanel.setBackground(Color.LIGHT_GRAY);
+        rightPanel.setBackground(Color.decode("#212630"));
 
         updateRightPanel();
     }
     private void updateRightPanel() throws IOException {
         rightPanel.removeAll();
-        JButton saveButton = new JButton("Save");
+        JButton saveButton = new JButton("Save Scene");
         saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         saveButton.addActionListener(e -> {
-            String newName = JOptionPane.showInputDialog(HueMenue.this, "Enter new file name:", "Save As", JOptionPane.PLAIN_MESSAGE);
+            String newName = JOptionPane.showInputDialog(HueMenue.this, "Enter new scene name:", "Save As", JOptionPane.PLAIN_MESSAGE);
             if (newName != null && !newName.trim().isEmpty()) {
                 copyFile("lights.json", newName.trim() + ".json");
             }
@@ -141,10 +145,10 @@ public class HueMenue extends JPanel {
         saveButton.setOpaque(true);
         saveButton.setBorderPainted(false);
         saveButton.setBackground(new Color(0, 153, 0)); // A green color
-        saveButton.setForeground(Color.WHITE); // Text color to white
+        saveButton.setForeground(WHITE); // Text color to white
         saveButton.setFocusPainted(false);
         saveButton.setFont(new Font("Tahoma", Font.BOLD, 12));
-        saveButton.setPreferredSize(new Dimension(100, 40)); // Adjust the size as needed
+        saveButton.setPreferredSize(new Dimension(400, 40)); // Adjust the size as needed
         saveButton.setMaximumSize(saveButton.getPreferredSize());
         rightPanel.add(saveButton);
 
@@ -152,24 +156,58 @@ public class HueMenue extends JPanel {
 
         Color darkGrey = new Color(50, 50, 50);
         List<String> jsonFiles = getJsonFileNames("");
-        jsonFiles.forEach(fileName -> {
+        ImageIcon originalDeleteIcon = new ImageIcon("src/main/java/teko/ch/zigbee/assets/icons/trash.png");
+
+        for (String fileName : jsonFiles) {
+            JPanel scenePanel = new JPanel();
+            scenePanel.setLayout(new BoxLayout(scenePanel, BoxLayout.LINE_AXIS));
+            scenePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
             JButton sceneButton = new JButton(fileName);
             sceneButton.addActionListener(e -> copySceneToLights(fileName + ".json", "lights.json"));
-            sceneButton.setOpaque(true);
-            sceneButton.setBorderPainted(false);
-            sceneButton.setBackground(darkGrey);
-            sceneButton.setForeground(Color.WHITE);
-            sceneButton.setFocusPainted(false);
-            sceneButton.setFont(new Font("Tahoma", Font.BOLD, 12));
-            sceneButton.setPreferredSize(new Dimension(100, 40));
-            sceneButton.setMaximumSize(sceneButton.getPreferredSize());
+            styleButton(sceneButton, darkGrey, 150, 40);
 
-            rightPanel.add(sceneButton);
+            ImageIcon deleteIcon = new ImageIcon(originalDeleteIcon.getImage().getScaledInstance(-1, sceneButton.getPreferredSize().height -20, Image.SCALE_SMOOTH -20));
+
+            JButton deleteButton = new JButton(deleteIcon);
+            deleteButton.addActionListener(e -> deleteScene(fileName, scenePanel));
+            styleButton(deleteButton, darkGrey, sceneButton.getPreferredSize().width - 70, sceneButton.getPreferredSize().height);
+
+            scenePanel.add(sceneButton);
+            scenePanel.add(deleteButton);
+            rightPanel.add(scenePanel);
             rightPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        });
+        }
 
         rightPanel.revalidate();
         rightPanel.repaint();
+    }
+    private void styleButton(JButton button, Color bgColor, int width, int height) {
+        button.setOpaque(true);
+        button.setBorderPainted(false);
+        button.setBackground(bgColor);
+        button.setForeground(WHITE);
+        button.setFocusPainted(false);
+        button.setFont(new Font("Tahoma", Font.BOLD, 12));
+        button.setPreferredSize(new Dimension(width, height));
+        button.setMaximumSize(button.getPreferredSize());
+    }
+
+    private void deleteScene(String fileName, JPanel scenePanel) {
+        int dialogResult = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this scene?",
+                "Confirm Delete", JOptionPane.YES_NO_OPTION);
+        if (dialogResult == JOptionPane.YES_OPTION) {
+            try {
+                Files.delete(Paths.get(fileName + ".json"));
+                rightPanel.remove(scenePanel);
+                rightPanel.revalidate();
+                rightPanel.repaint();
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "Error deleting the scene: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        }
     }
 
     private void copySceneToLights(String sourceFileName, String destFileName) {
