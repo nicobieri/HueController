@@ -73,28 +73,29 @@ public class HueMenue extends JPanel {
                 JPanel row = new JPanel();
 
                 JLabel label = new JLabel(name);
+
                 String iconName = on ? "switch-on.png" : "switch-off.png";
                 JButton button = new JButton(new ImageIcon("src/main/java/teko/ch/zigbee/assets/icons/" + iconName));
                 button.setBorderPainted(false);
                 button.setContentAreaFilled(false);
+                button.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
                 // Toggle state on button click
                 button.addActionListener(e -> toggleLampState(name, !on));
 
+                // Create color slider
                 CIEColorSlider colorSlider = new CIEColorSlider((x1, y1) -> {
                     updateLampColor(name, x1, y1);
                 });
                 colorSlider.setInitialValues(x, y);
 
+                // Create brightness slider
                 int maxBrightness = 254; // Maximum brightness value for Hue lamps
                 int minBrightness = 0; // Minimum brightness value
                 int currentBrightness = lampNode.get("state").get("bri").asInt(); // Get current brightness
-                JSlider brightnessSlider = new JSlider(JSlider.VERTICAL, minBrightness, maxBrightness, currentBrightness);
-                brightnessSlider.setInverted(false); // Invert the slider so that up is more brightness
+                JSlider brightnessSlider = new JSlider(JSlider.HORIZONTAL, minBrightness, maxBrightness, currentBrightness);
 
-                Dimension dim = brightnessSlider.getPreferredSize();
-                brightnessSlider.setPreferredSize(new Dimension(dim.width, dim.height / 2)); // Set height to half
-// Add change listener to update brightness
+                // Add change listener to brightness slider
                 brightnessSlider.addChangeListener(e -> {
                     if (!brightnessSlider.getValueIsAdjusting()) {
                         int newBrightness = brightnessSlider.getValue();
@@ -102,12 +103,15 @@ public class HueMenue extends JPanel {
                     }
                 });
 
-
-                row.add(label);
-                row.add(brightnessSlider);
+                // Add components to the row
                 row.add(colorSlider);
-                row.add(Box.createHorizontalGlue());
+                row.add(Box.createHorizontalStrut(5)); // Fixed space between components
+                row.add(label);
+                row.add(Box.createHorizontalStrut(5)); // Fixed space between components
+                row.add(brightnessSlider);
+                row.add(Box.createHorizontalGlue()); // Pushes everything to the left
                 row.add(button);
+                row.add(Box.createRigidArea(new Dimension(5, 0))); // Gap on the right side
 
                 leftPanel.add(row);
             }
