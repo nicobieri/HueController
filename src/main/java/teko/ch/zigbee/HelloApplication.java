@@ -27,31 +27,37 @@ public class HelloApplication extends Application {
 
     public static void main(String[] args) throws IOException {
 
-        MainFrame mainFrame = new MainFrame();
-        HueGui hueGuiPanel = new HueGui(mainFrame);
-        HueMenue hueMenuePanel = new HueMenue();
+        File configFile = new File("config.txt");
 
-        mainFrame.addPanel(hueGuiPanel, "HueGui");
-        mainFrame.addPanel(hueMenuePanel, "HueMenue");
+
 
         // Check if config file exists and switch to the appropriate panel
-        File configFile = new File("config.txt");
+        System.out.println(configFile.exists());
+
         if (configFile.exists()) {
-            System.out.println("Config file exists");
-
+            MainFrame mainFrame = new MainFrame();
+            HueGui hueGuiPanel = new HueGui(mainFrame);
+            HueMenue hueMenuePanel = new HueMenue();
+            mainFrame.addPanel(hueGuiPanel, "HueGui");
+            mainFrame.addPanel(hueMenuePanel, "HueMenue");
             mainFrame.switchToPanel("HueMenue");
 
             mainFrame.switchToPanel("HueMenue");
+            mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            mainFrame.pack();
+            mainFrame.setVisible(true);
 
 
         } else {
+            MainFrame mainFrame = new MainFrame();
+            HueGui hueGuiPanel = new HueGui(mainFrame);
+            mainFrame.addPanel(hueGuiPanel, "HueGui");
             System.out.println("Config file does not exist");
             mainFrame.switchToPanel("HueGui");
+            mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            mainFrame.pack();
+            mainFrame.setVisible(true);
         }
-
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.pack();
-        mainFrame.setVisible(true);
 
         launch();
     }

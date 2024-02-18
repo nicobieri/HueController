@@ -4,9 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,8 +15,43 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class hueBridgeConnector {
+    public static String findIPFromMAC(String macAddress) {
+        String ipAddress = null;
+        try {
+            // Run the command
+            Process p = Runtime.getRuntime().exec("arp -a");
+            BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            // Read the output
+            String line;
+            while ((line = input.readLine()) != null) {
+                line = line.trim();
+                if (line.contains(macAddress)) {
+                    String[] parts = line.split("\\s+");
+                    System.out.println(parts.length);
+                    if (parts.length >= 3) {
+                        ipAddress = parts[0];
+                        System.out.println(ipAddress);
+                        return ipAddress;
+                    }
+                }
+            }
+            input.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ipAddress;
+    }
 
     public static String getMyIP() {
+        String macAddress = "ec-b5-fa-2a-57-54"; // Replace with the actual MAC address
+        String ip = findIPFromMAC(macAddress);
+        if (ip != null) {
+            System.out.println("IP Address found: " + ip);
+            return ip;
+        } else {
+            System.out.println("IP Address not found for MAC: " + macAddress);
+
         List<String> ipAddresses = new ArrayList<>();
         try {
             URL url = new URL("https://discovery.meethue.com/");
@@ -41,14 +76,14 @@ public class hueBridgeConnector {
 
         } catch (Exception e) {
            // e.printStackTrace();
-            System.out.println("this");
+            System.out.println("no IP response");
         }
         String ipAddress = ipAddresses.toString();
         if (ipAddress.startsWith("[") && ipAddress.endsWith("]")) {
             ipAddress = ipAddress.substring(1, ipAddress.length() - 1);
         }
         return ipAddress;
-
+    }
     }
 
     public String getKey() throws IOException {
@@ -88,7 +123,10 @@ public class hueBridgeConnector {
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                     }
-                    System.out.println(response);
+
+                    if(response.toString().contains("link button not pressed")){
+                        return response.toString();
+                    }
 
                     // Parse the response to get the key
                     ObjectMapper mapper = new ObjectMapper();
@@ -98,13 +136,13 @@ public class hueBridgeConnector {
                         bridgeKey = successNode.path("username").asText();
                         System.out.println("Hue Bridge Key: " + bridgeKey);
                     }
+                    return bridgeKey;
                 }
             } finally {
                 if (connection != null) {
                     connection.disconnect();
                 }
             }
-            return bridgeKey;
         }
 
     }

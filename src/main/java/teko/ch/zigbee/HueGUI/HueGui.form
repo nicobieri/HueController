@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="HueGui" layout-manager="GridLayoutManager" row-count="5" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="20" left="0" bottom="100" right="0"/>
     <constraints>
-      <xy x="410" y="60" width="900" height="800"/>
+      <xy x="22" y="25" width="900" height="800"/>
     </constraints>
     <properties>
       <background color="-14604752"/>
