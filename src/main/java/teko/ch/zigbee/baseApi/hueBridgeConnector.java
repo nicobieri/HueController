@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,14 +42,13 @@ public class hueBridgeConnector {
         return ipAddress;
     }
 
-    public static String getMyIP() {
-        String macAddress = "ec-b5-fa-2a-57-54"; // Replace with the actual MAC address
-        String ip = findIPFromMAC(macAddress);
+    public static String getMyIP(String mac) {
+        String ip = findIPFromMAC(mac);
         if (ip != null) {
             System.out.println("IP Address found: " + ip);
             return ip;
         } else {
-            System.out.println("IP Address not found for MAC: " + macAddress);
+            System.out.println("IP Address not found for MAC: " + mac);
 
         List<String> ipAddresses = new ArrayList<>();
         try {
@@ -86,8 +84,8 @@ public class hueBridgeConnector {
     }
     }
 
-    public String getKey() throws IOException {
-        String bridgeIPs = getMyIP();
+    public String getKey(String macAddress) throws IOException {
+        String bridgeIPs = getMyIP(macAddress);
         String bridgeKey = "";
             String apiUrl = "http://" + bridgeIPs + "/api";
             HttpURLConnection connection = null;

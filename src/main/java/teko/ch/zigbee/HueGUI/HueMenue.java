@@ -29,7 +29,7 @@ public class HueMenue extends JPanel {
     private JTextArea textArea; // Text area for displaying text
     private HueBridgeController controller; // Instance variable for controller
 
-    public HueMenue() throws IOException {
+    public HueMenue(MainFrame mainFrame) throws IOException {
         this.setLayout(new BorderLayout());
 
         initializeController();

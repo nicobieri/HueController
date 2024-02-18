@@ -1,17 +1,12 @@
 package teko.ch.zigbee;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import teko.ch.zigbee.HueGUI.HueGui;
 import teko.ch.zigbee.HueGUI.HueMenue;
 import teko.ch.zigbee.HueGUI.MainFrame;
-import teko.ch.zigbee.baseApi.HueBridgeController;
-import teko.ch.zigbee.baseApi.jsonFile;
-import teko.ch.zigbee.baseApi.readData;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -37,7 +32,7 @@ public class HelloApplication extends Application {
         if (configFile.exists()) {
             MainFrame mainFrame = new MainFrame();
             HueGui hueGuiPanel = new HueGui(mainFrame);
-            HueMenue hueMenuePanel = new HueMenue();
+            HueMenue hueMenuePanel = new HueMenue(mainFrame);
             mainFrame.addPanel(hueGuiPanel, "HueGui");
             mainFrame.addPanel(hueMenuePanel, "HueMenue");
             mainFrame.switchToPanel("HueMenue");
