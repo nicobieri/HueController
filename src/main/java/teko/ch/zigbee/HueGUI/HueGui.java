@@ -22,6 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+//TODO Layout how it is look like, dont open a new window here! after connection.
 public class HueGui extends JPanel {
     private JPanel HueGui;
     private JButton ButtonToConnect;
@@ -72,9 +73,9 @@ public class HueGui extends JPanel {
                     configData.put("IP", ipAddress);
                     configData.put("Key", bridgeKey);
 
-                    Runnable task = () -> ConfigManager.writeConfig(configFilePath, configData);
+                // Directly calling the method to write config data synchronously.
+                ConfigManager.writeConfig(configFilePath, configData);
 
-                    executorService.schedule(task, 0, TimeUnit.SECONDS);
 
 
                 String bridgeBaseUrl = "http://" + ipAddress + "/api/"; // Replace with your Hue Bridge base URL
@@ -86,21 +87,10 @@ public class HueGui extends JPanel {
                 System.out.println("finish");
 
                 File configFile = new File("config.txt");
-
+                HueMenue hueMenuePanel = new HueMenue(mainFrame);
                 if (configFile.exists()) {
-                    MainFrame mainFrame = new MainFrame();
-                    HueGui hueGuiPanel = new HueGui(mainFrame);
-                    HueMenue hueMenuePanel = new HueMenue(mainFrame);
-
-                    mainFrame.addPanel(hueGuiPanel, "HueGui");
-                    mainFrame.addPanel(hueMenuePanel, "HueMenue");
-
                     mainFrame.switchToPanel("HueMenue");
-
-                    mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                    mainFrame.pack();
-                    mainFrame.setVisible(true);
-
+                    hueMenuePanel.refreshPanelContents();
                 }
             }
 
@@ -151,7 +141,7 @@ public class HueGui extends JPanel {
         bottomPanel.add(macAddressLabel);
 
         // MAC address input field
-        macAddressField = new JTextField("XX-XX-XX-XX-XX-XX");
+        macAddressField = new JTextField("xx-xx-xx-xx-xx-xx");
         macAddressField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30)); // Set text field height
         macAddressField.setHorizontalAlignment(JTextField.CENTER);
         macAddressField.setBorder(BorderFactory.createLineBorder(Color.WHITE));
@@ -161,7 +151,7 @@ public class HueGui extends JPanel {
         macAddressField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-                if (macAddressField.getText().equals("XX-XX-XX-XX-XX-XX")) {
+                if (macAddressField.getText().equals("xx-xx-xx-xx-xx-xx")) {
                     macAddressField.setText("");
                     macAddressField.getCaret().setBlinkRate(500); // Restore blink rate when field is focused
                 }
