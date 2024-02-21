@@ -107,10 +107,11 @@ public class HueGui extends JPanel {
         HueGui.setBackground(Color.decode("#212630")); // Sets the background color of the panel
 
         // Top logo
-        ImageIcon logoIcon = new ImageIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/teko/ch/zigbee/Philips_Hue_logo.svg.png"))).getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH));
+        ImageIcon logoIcon = new ImageIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/teko/ch/zigbee/phillips-hue-mobile-header.png"))).getImage().getScaledInstance(120, 100, Image.SCALE_SMOOTH));
         JLabel logoLabel = new JLabel(logoIcon);
         logoLabel.setHorizontalAlignment(JLabel.CENTER);
         logoLabel.setVerticalAlignment(JLabel.TOP);
+        logoLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 40, 0));
 
         // Center panel for the bridge button image
         JPanel centerPanel = new JPanel();
@@ -120,8 +121,10 @@ public class HueGui extends JPanel {
 
         // Instruction label
         JLabel instructionLabel = new JLabel("Click The Button on your Hue Bridge", SwingConstants.CENTER);
-        instructionLabel.setForeground(Color.WHITE); // Set the text color to white
-        instructionLabel.setFont(new Font(instructionLabel.getFont().getName(), Font.BOLD, 14)); // Change font style and size
+        instructionLabel.setForeground(Color.WHITE);
+        instructionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        instructionLabel.setFont(new Font(instructionLabel.getFont().getName(), Font.BOLD, 22));
+        instructionLabel.setBorder(BorderFactory.createEmptyBorder(20, 40, 40, 40));
         centerPanel.add(instructionLabel);
 
         // Image label
@@ -133,16 +136,19 @@ public class HueGui extends JPanel {
         // Bottom panel for MAC address input and connect button
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
-        bottomPanel.setOpaque(false); // Transparent
+        bottomPanel.setOpaque(false);
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
 
         // MAC address label
         JLabel macAddressLabel = new JLabel("Manually add the MAC Address to find the Bridge's IP for the connection:");
         macAddressLabel.setForeground(Color.WHITE); // Set the text color to white
+        macAddressLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        macAddressLabel.setBorder(BorderFactory.createEmptyBorder(10, 100, 20, 100));
         bottomPanel.add(macAddressLabel);
 
         // MAC address input field
         macAddressField = new JTextField("xx-xx-xx-xx-xx-xx");
-        macAddressField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30)); // Set text field height
+        macAddressField.setMaximumSize(new Dimension(200, 50));
         macAddressField.setHorizontalAlignment(JTextField.CENTER);
         macAddressField.setBorder(BorderFactory.createLineBorder(Color.WHITE));
         macAddressField.setOpaque(false);
@@ -173,6 +179,7 @@ public class HueGui extends JPanel {
         findMacAddressButton.setBorderPainted(false);
         findMacAddressButton.setContentAreaFilled(false);
         findMacAddressButton.setForeground(Color.WHITE);
+        findMacAddressButton.setBorder(BorderFactory.createEmptyBorder(20, 0, 40, 0));
         bottomPanel.add(findMacAddressButton);
 
         // Connect button
@@ -184,6 +191,7 @@ public class HueGui extends JPanel {
         statusLabel = new JLabel("Status: Not connected", JLabel.CENTER);
         statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         statusLabel.setForeground(Color.WHITE);
+        statusLabel.setBorder(BorderFactory.createEmptyBorder(40, 0, 10, 0));
         bottomPanel.add(statusLabel);
 
         // Add sub-panels to main panel
