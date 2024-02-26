@@ -5,6 +5,8 @@ import javafx.stage.Stage;
 import teko.ch.zigbee.HueGUI.HueGui;
 import teko.ch.zigbee.HueGUI.HueMenue;
 import teko.ch.zigbee.HueGUI.MainFrame;
+import teko.ch.zigbee.baseApi.HueBridgeController;
+import teko.ch.zigbee.baseApi.readData;
 
 import javax.swing.*;
 import java.io.File;
@@ -25,6 +27,7 @@ public class HelloApplication extends Application {
         MainFrame mainFrame = new MainFrame();
         HueGui hueGuiPanel = new HueGui(mainFrame);
         HueMenue hueMenuePanel = new HueMenue(mainFrame);
+
 
         // Add the panels to the main frame
         mainFrame.addPanel(hueGuiPanel, "HueGui");

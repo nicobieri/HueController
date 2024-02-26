@@ -29,6 +29,7 @@ public class HueBridgeController {
     }
 
     public void setAllLamps() throws IOException {
+        System.out.println(getAllLamps());
         Path path = Paths.get("lights.json");
         String yourJsonString = Files.readString(path);
         Map<String, LightState> allLightsConfig = objectMapper.readValue(yourJsonString, new TypeReference<Map<String, LightState>>() {});

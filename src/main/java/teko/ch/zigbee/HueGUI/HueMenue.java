@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.Timer;
@@ -110,7 +111,7 @@ public class HueMenue extends JPanel {
                 label.setForeground(Color.WHITE);
 
                 String iconName = on ? "switch-on.png" : "switch-off.png";
-                JButton button = new JButton(new ImageIcon("src/main/java/teko/ch/zigbee/assets/icons/" + iconName));
+                JButton button = new JButton(new ImageIcon(Objects.requireNonNull(getClass().getResource("/teko/ch/zigbee/" + iconName))));
                 button.setBorderPainted(false);
                 button.setContentAreaFilled(false);
                 button.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -191,7 +192,7 @@ public class HueMenue extends JPanel {
 
             Color darkGrey = new Color(50, 50, 50);
             List<String> jsonFiles = getJsonFileNames("");
-            ImageIcon originalDeleteIcon = new ImageIcon("src/main/java/teko/ch/zigbee/assets/icons/trash.png");
+            ImageIcon originalDeleteIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/teko/ch/zigbee/trash.png")));
 
             for (String fileName : jsonFiles) {
                 JPanel scenePanel = new JPanel();

@@ -2,9 +2,7 @@ package teko.ch.zigbee.HueGUI;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.json.JSONObject;
-import teko.ch.zigbee.baseApi.ConfigManager;
-import teko.ch.zigbee.baseApi.HueBridgeController;
-import teko.ch.zigbee.baseApi.hueBridgeConnector;
+import teko.ch.zigbee.baseApi.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -82,7 +80,15 @@ public class HueGui extends JPanel {
                 System.out.println(bridgeBaseUrl);
 
                 HueBridgeController controller = new HueBridgeController(bridgeBaseUrl, bridgeKey);
-                controller.getAllLamps();
+                JsonNode allLamps = controller.getAllLamps();
+
+                System.out.println(allLamps);
+
+                jsonFile.writeJsonToFile(allLamps, "lights.json");
+
+                System.out.println(controller.getAllLamps());
+
+                //jsonFile json = new jsonFile();
 
                 System.out.println("finish");
 

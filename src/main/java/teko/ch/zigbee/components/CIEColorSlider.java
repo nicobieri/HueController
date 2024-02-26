@@ -10,6 +10,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 // TODO x y values default values of the lamp status and slo the xy value in the picker!!
 
@@ -44,7 +45,7 @@ public class CIEColorSlider extends JSlider {
             }
         });
         try {
-            backgroundImage = ImageIO.read(new File("src/main/java/teko/ch/zigbee/assets/icons/colorPicker.png")); // Replace with your image path
+            backgroundImage = ImageIO.read(Objects.requireNonNull(getClass().getResource("/teko/ch/zigbee/colorPicker.png")));
         } catch (IOException e) {
             e.printStackTrace();
             backgroundImage = null;

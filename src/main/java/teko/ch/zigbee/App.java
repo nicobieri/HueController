@@ -1,0 +1,9 @@
+package teko.ch.zigbee;
+
+import java.io.IOException;
+
+public class App {
+    public static void main(String[] args) throws IOException {
+        HelloApplication.main(args);
+    }
+}
