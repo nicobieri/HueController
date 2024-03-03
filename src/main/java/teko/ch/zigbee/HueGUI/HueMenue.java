@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import teko.ch.zigbee.baseApi.HueBridgeController;
-import teko.ch.zigbee.baseApi.readData;
+import teko.ch.zigbee.data.readData;
 import teko.ch.zigbee.components.CIEColorSlider;
 
 import javax.swing.*;
@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.swing.Timer;
 
 import static java.awt.Color.WHITE;
 

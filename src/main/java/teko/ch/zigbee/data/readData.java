@@ -1,4 +1,6 @@
-package teko.ch.zigbee.baseApi;
+package teko.ch.zigbee.data;
+
+import teko.ch.zigbee.baseApi.hueBridgeConnector;
 
 import java.util.HashMap;
 import java.util.Map;

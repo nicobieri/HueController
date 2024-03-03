@@ -1,4 +1,4 @@
-package teko.ch.zigbee.baseApi;
+package teko.ch.zigbee.data;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

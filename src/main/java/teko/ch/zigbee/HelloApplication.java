@@ -5,8 +5,6 @@ import javafx.stage.Stage;
 import teko.ch.zigbee.HueGUI.HueGui;
 import teko.ch.zigbee.HueGUI.HueMenue;
 import teko.ch.zigbee.HueGUI.MainFrame;
-import teko.ch.zigbee.baseApi.HueBridgeController;
-import teko.ch.zigbee.baseApi.readData;
 
 import javax.swing.*;
 import java.io.File;

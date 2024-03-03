@@ -1,4 +1,4 @@
-package teko.ch.zigbee.baseApi;
+package teko.ch.zigbee.data;
 
 import java.io.*;
 import java.util.HashMap;

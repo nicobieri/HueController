@@ -1,8 +1,9 @@
 package teko.ch.zigbee.HueGUI;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.json.JSONObject;
 import teko.ch.zigbee.baseApi.*;
+import teko.ch.zigbee.data.ConfigManager;
+import teko.ch.zigbee.data.jsonFile;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +19,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 //TODO Layout how it is look like, dont open a new window here! after connection.
 public class HueGui extends JPanel {

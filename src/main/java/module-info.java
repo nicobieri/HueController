@@ -9,4 +9,5 @@ module teko.ch.zigbee {
     opens teko.ch.zigbee to javafx.fxml;
     exports teko.ch.zigbee; // Export the teko.ch.zigbee module itself to javafx.graphics
     exports teko.ch.zigbee.baseApi to com.fasterxml.jackson.databind;
+    exports teko.ch.zigbee.data to com.fasterxml.jackson.databind;
 }
