@@ -100,8 +100,23 @@ public class HueMenue extends JPanel {
             for (JsonNode lampNode : jsonResponse) {
                 String name = lampNode.get("name").asText();
                 boolean on = lampNode.get("state").get("on").asBoolean();
-                double x = lampNode.get("state").get("xy").get(0).asDouble();
-                double y = lampNode.get("state").get("xy").get(1).asDouble();
+
+                // Get color values
+                JsonNode colorNode = lampNode.get("state").get("xy");
+                double x = 0.0;
+                double y = 0.0;
+                if (colorNode != null && colorNode.isArray() && colorNode.size() >= 2) {
+                    x = colorNode.get(0).asDouble();
+                    y = colorNode.get(1).asDouble();
+                }
+
+                // Get brightness value
+                int maxBrightness = 254;
+                int currentBrightness = 0;
+                JsonNode brightnessNode = lampNode.get("state").get("bri");
+                if (brightnessNode != null) {
+                    currentBrightness = brightnessNode.asInt();
+                }
 
                 JPanel row = new JPanel();
                 row.setBackground(Color.decode("#212630"));
@@ -126,12 +141,8 @@ public class HueMenue extends JPanel {
                 colorSlider.setBackground(Color.decode("#212630"));
 
                 // Create brightness slider
-                int maxBrightness = 254; // Maximum brightness value for Hue lamps
-                int minBrightness = 0; // Minimum brightness value
-                int currentBrightness = lampNode.get("state").get("bri").asInt(); // Get current brightness
-                JSlider brightnessSlider = new JSlider(JSlider.HORIZONTAL, minBrightness, maxBrightness, currentBrightness);
+                JSlider brightnessSlider = new JSlider(JSlider.HORIZONTAL, 0, maxBrightness, currentBrightness);
                 brightnessSlider.setBackground(Color.decode("#212630"));
-
                 brightnessSlider.addChangeListener(e -> {
                     if (!brightnessSlider.getValueIsAdjusting()) {
                         int newBrightness = brightnessSlider.getValue();
@@ -156,6 +167,7 @@ public class HueMenue extends JPanel {
         leftPanel.revalidate();
         leftPanel.repaint();
     }
+
 
     private void initializeRightPanel() throws IOException {
         rightPanel = new JPanel();
